@@ -1,0 +1,10 @@
+{
+  "name": "Révision Espacée : Architecte Fantôme",
+  "short_name": "Révision Espacée",
+  "description": "Application locale de révision espacée, offline-first.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "lang": "fr"
+}

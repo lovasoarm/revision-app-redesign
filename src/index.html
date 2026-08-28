@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5ede4" id="themeColorMeta" />
+    <meta
+      name="description"
+      content="Révision espacée locale, offline-first, sans dépendance réseau."
+    />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <title>Révision Espacée : J+1 / J+7 / J+21 / J+60</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a id="skip-link" href="#main" class="visually-hidden-focusable">Passer au contenu</a>>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">SR</span>
+        <div>
+          <h1>Révision Espacée</h1>
+          <p class="sub">
+            Architecte Fantôme · Courbe de l'oubli
+            <span class="offline-chip" title="Les données restent sur cet appareil">● offline</span>
+          </p>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs" aria-label="Navigation principale">
+        <button class="tab active" data-view="dashboard">
+          Dashboard <span class="shortcut-key" aria-hidden="true">Alt+1</span>
+        </button>
+        <button class="tab" data-view="today">
+          Aujourd'hui <span class="badge badge-due" id="todayCount">0</span>
+          <span class="shortcut-key" aria-hidden="true">Alt+2</span>
+        </button>
+        <button class="tab" data-view="history">
+          Historique <span class="shortcut-key" aria-hidden="true">Alt+3</span>
+        </button>
+        <button class="tab" data-view="stats">
+          Statistiques <span class="shortcut-key" aria-hidden="true">Alt+4</span>
+        </button>
+        <button class="tab" data-view="settings">
+          Réglages <span class="shortcut-key" aria-hidden="true">Alt+5</span>
+        </button>
+      </nav>
+      <button
+        class="btn btn-sm theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="Passer au thème clair"
+        title="Passer au thème clair"
+      >
+        <span class="theme-toggle-icon" id="themeToggleIcon" aria-hidden="true">☀</span>
+      </button>
+    </header>
+
+    <main>
+      <!-- DASHBOARD -->
+      <section class="view active" id="view-dashboard">
+        <div class="view-intro view-intro-dashboard">
+          <div class="view-kicker">TABLEAU DE BORD</div>
+          <div class="view-title-row">
+            <div>
+              <h2 class="view-title">Votre mémoire, en mouvement.</h2>
+              <p class="view-lede">
+                Un aperçu net de ce qui demande votre attention, puis l'espace de travail pour
+                construire votre arbre d'apprentissage.
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- bandeau d'alerte de retard : rempli dynamiquement par JS,
+             vide et invisible (hidden) s'il n'y a aucun retard -->
+        <div id="alertBanner" class="alert-banner" hidden></div>
+        <div id="dashboardFirstRun" class="dashboard-first-run" hidden></div>
+        <div
+          id="dashboardOverview"
+          class="dashboard-overview"
+          aria-label="Vue d'ensemble"
+          hidden
+        ></div>
+        <!-- les chips restent toujours visibles (aperçu rapide de ce qui
+             existe) même quand le formulaire de création est replié -->
+        <div class="panel panel-category">
+          <div class="panel-head-row">
+            <h2>Catégories</h2>
+          </div>
+          <div id="categoryChips" class="category-chips"></div>
+          <details class="collapsible-form">
+            <summary>+ Nouvelle catégorie</summary>
+            <p class="muted small">
+              Une catégorie regroupe un univers d'apprentissage complet et séparé des autres (ex.
+              Informatique, Psychologie, Langues). Tout module se range obligatoirement sous une
+              catégorie, directement ou via un sous-module.
+            </p>
+            <form id="categoryForm" class="form-row">
+              <label
+                >Nom de la catégorie<input
+                  type="text"
+                  id="cName"
+                  required
+                  maxlength="60"
+                  placeholder="Ex : Informatique"
+              /></label>
+              <button class="btn btn-primary" type="submit">Créer la catégorie</button>
+            </form>
+          </details>
+        </div>
+        <details class="panel collapsible-form" id="moduleFormPanel">
+          <summary><h2 class="summary-h2">+ Nouveau module</h2></summary>
+          <form id="moduleForm" class="form-row">
+            <label
+              >Nom du module<input
+                type="text"
+                id="mName"
+                required
+                maxlength="80"
+                placeholder="Ex : 07_hash_table"
+            /></label>
+            <label
+              >Catégorie / module parent<select id="mParent" required>
+                <option value="" disabled selected>: Choisir une catégorie ou un module</option>
+              </select></label
+            >
+            <label>Date de début<input type="date" id="mStart" required /></label>
+            <label
+              >Durée estimée (min)<input type="number" id="mDuration" min="1" max="1000" value="60"
+            /></label>
+            <button class="btn btn-primary" type="submit">Ajouter</button>
+          </form>
+          <div class="form-row form-row-secondary">
+            <label class="label-wide"
+              >Description (optionnel)<textarea
+                id="mDescription"
+                maxlength="600"
+                rows="2"
+                placeholder="Ce que couvre ce module…"
+              ></textarea>
+            </label>
+            <label class="label-wide"
+              >À retenir vraiment (optionnel)<textarea
+                id="mTakeaway"
+                maxlength="300"
+                rows="2"
+                placeholder="Le point clé à ne jamais oublier…"
+              ></textarea>
+            </label>
+          </div>
+          <p class="muted small hint">
+            Choisissez une catégorie pour un module de haut niveau, ou un module existant pour créer
+            un sous-module : sans limite de profondeur. Astuce : le bouton « + module » / « +
+            sous-module » sur une carte règle ce champ automatiquement et déplie ce formulaire.
+            Description et « à retenir » restent modifiables à tout moment depuis la carte du
+            module.
+          </p>
+        </details>
+        <div class="panel dashboard-primary">
+          <div class="panel-head">
+            <div class="section-title-group">
+              <h2>Modules</h2>
+              <span class="section-count" id="moduleCount">0</span>
+            </div>
+            <div class="btn-row tree-toolbar">
+              <input type="search" id="search" class="search" placeholder="Rechercher…" />
+              <select id="statusFilter" class="search">
+                <option value="">Tous les statuts</option>
+                <option value="learned">Compris</option>
+                <option value="review">À revoir</option>
+                <option value="unset">Non évalué</option>
+              </select>
+              <button class="btn btn-sm" id="expandAllBtn" type="button">Tout déplier</button>
+              <button class="btn btn-sm" id="collapseAllBtn" type="button">Tout replier</button>
+            </div>
+          </div>
+          <div id="moduleList" class="cards tree-list"></div>
+        </div>
+      </section>
+
+      <!-- TODAY -->
+      <section class="view" id="view-today">
+        <div class="view-intro">
+          <div class="view-kicker">SESSION DU JOUR</div>
+          <h2 class="view-title">Réviser maintenant.</h2>
+          <p class="view-lede">
+            Une seule mission ici : faire les révisions dues sans détourner votre attention.
+          </p>
+        </div>
+        <div class="panel inverse-card">
+          <h2>
+            Révisions dues aujourd'hui
+            <span class="muted" id="todayDate"></span>
+          </h2>
+          <div id="todayList" class="cards today-list"></div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="view" id="view-history">
+        <div class="view-intro">
+          <div class="view-kicker">JOURNAL</div>
+          <h2 class="view-title">Ce que vous avez réellement fait.</h2>
+          <p class="view-lede">
+            Un historique lisible pour retrouver un épisode d'apprentissage sans transformer la page
+            en tableau administratif.
+          </p>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Historique</h2>
+            <div class="btn-row">
+              <select id="historyFilter" class="search">
+                <option value="">Tous les modules</option>
+              </select>
+              <select id="historyTypeFilter" class="search">
+                <option value="">Révisions + maîtrise</option>
+                <option value="reviews">Révisions uniquement</option>
+                <option value="mastery">Maîtrise uniquement</option>
+              </select>
+            </div>
+          </div>
+          <div class="history-legend">
+            <div class="history-legend-item">
+              <span class="history-legend-swatch review"></span>
+              ↻ Révision faite (Oui / Partiellement / Non)
+            </div>
+            <div class="history-legend-item">
+              <span class="history-legend-swatch mastery"></span>
+              ◐ Jauge de maîtrise ajustée (+/− compris)
+            </div>
+          </div>
+          <div class="history-meta">
+            <span class="section-count" id="historyCount">0</span
+            ><span class="muted small">évènements</span>
+          </div>
+          <div id="historyList" class="cards history-list"></div>
+        </div>
+      </section>
+
+      <!-- STATS -->
+      <section class="view" id="view-stats">
+        <div class="view-intro">
+          <div class="view-kicker">MESURE</div>
+          <h2 class="view-title">La maîtrise, pas le bruit.</h2>
+          <p class="view-lede">
+            Quelques indicateurs utiles pour comprendre la solidité de vos acquis et décider où
+            porter l'effort.
+          </p>
+        </div>
+        <div class="panel">
+          <h2>Statistiques</h2>
+          <div id="statsBox" class="stats-container"></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" id="view-settings">
+        <div class="view-intro">
+          <div class="view-kicker">ESPACE DE TRAVAIL</div>
+          <h2 class="view-title">Réglages qui restent simples.</h2>
+          <p class="view-lede">
+            Vos données et votre structure d'apprentissage, sans détour ni couche technique inutile.
+          </p>
+        </div>
+        <div class="settings-grid">
+          <div class="panel settings-panel">
+            <h2>Données</h2>
+            <div class="btn-row">
+              <button class="btn" id="exportBtn">Exporter (JSON)</button>
+              <button class="btn" id="importBtn">Importer (JSON)</button>
+              <input type="file" id="importFile" accept="application/json,.json" hidden />
+              <button class="btn btn-danger" id="resetBtn">Réinitialiser tout</button>
+            </div>
+            <p class="muted small">
+              Stockage local : <span id="storageMode">…</span>. Aucune donnée ne quitte votre
+              machine.
+            </p>
+            <p class="muted small">
+              <strong>Export :</strong> dans l'app Tauri, une fenêtre native « Enregistrer sous »
+              s'ouvre pour choisir l'emplacement exact. En navigateur, le fichier part dans votre
+              dossier Téléchargements habituel : un message le confirme après l'export.
+            </p>
+            <p class="muted small">
+              <strong>Import :</strong> le fichier est vérifié avant tout remplacement (structure,
+              ids uniques, parents valides). En cas de fichier invalide, l'import est bloqué et le
+              détail des erreurs s'affiche ; sinon une confirmation indique le nombre de modules et
+              d'évènements avant d'écraser les données actuelles.
+            </p>
+          </div>
+          <div class="panel settings-panel">
+            <h2>Structure de démarrage</h2>
+            <p class="muted small">
+              Crée (ou réutilise) une catégorie « Informatique » contenant les modules et
+              sous-modules de la trame « Architecte Fantôme » (00-SOCLE → 05-MAITRISE), à détailler
+              ensuite avec vos propres sous-sous-modules et leçons.
+            </p>
+            <div class="btn-row">
+              <button class="btn" id="seedBtn" type="button">
+                Créer la structure Architecte Fantôme
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modale générique -->
+    <div class="modal-backdrop" id="modal" hidden aria-hidden="true">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalText"
+        tabindex="-1"
+      >
+        <h3 id="modalTitle"></h3>
+        <p id="modalText" class="muted"></p>
+        <input type="text" id="modalInput" class="search" hidden />
+        <div class="btn-row end">
+          <button class="btn" id="modalCancel">Annuler</button>
+          <button class="btn btn-danger" id="modalOk">Confirmer</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+    <script type="module" src="script.js"></script>
+    <script type="module" src="register-service-worker.js"></script>
+    <div
+      id="announcer"
+      aria-live="polite"
+      style="
+        position: absolute;
+        left: -9999px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- Onboarding Modal -->
+    <div
+      id="onboarding"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="onboarding-title"
+      aria-describedby="onboarding-desc"
+    >
+      <h2 id="onboarding-title">Bienvenue : Quelques points rapides</h2>
+      <p id="onboarding-desc">
+        Cette application fonctionne hors‑ligne, vos données sont stockées localement. Utilisez le
+        menu pour exporter/importer des sauvegardes.
+      </p>
+      <div style="display: flex; gap: 8px; margin-top: 12px">
+        <button id="onboarding-done">J'ai compris</button>
+        <button id="onboarding-dontshow">Ne plus afficher</button>
+      </div>
+    </div>
+  </body>
+</html>

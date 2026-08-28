@@ -1,0 +1,30 @@
+{
+  "build": {
+    "distDir": "../dist",
+    "devPath": "http://localhost:3000"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "fs": {
+        "all": false
+      },
+      "dialog": {
+        "all": false
+      },
+      "shell": {
+        "all": false
+      }
+    },
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; connect-src 'self'"
+    },
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://update.electronjs.org/your-repo/REPLACE"
+      ],
+      "dialog": true
+    }
+  }
+}

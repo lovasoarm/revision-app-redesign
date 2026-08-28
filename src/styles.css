@@ -1,0 +1,4675 @@
+:root {
+  /* Design tokens */
+  --color-bg: #ffffff;
+  --color-surface: #f8f9fa;
+  --color-foreground: #0f1724;
+  --color-primary: #0066cc;
+  --color-primary-contrast: #ffffff;
+  --radius: 8px;
+  --gap: 12px;
+  --max-width: 1000px;
+  --focus-outline: 3px solid rgba(0, 102, 204, 0.25);
+}
+
+/* Accessible focus for keyboard users */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen-reader friendly but visible on focus */
+.visually-hidden-focusable {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.visually-hidden-focusable:focus,
+.visually-hidden-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 8px;
+  padding: 8px 12px;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+/* Basic improvements for consistent UI */
+body {
+  background: var(--color-bg);
+  color: var(--color-foreground);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial;
+  line-height: 1.45;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--gap);
+}
+button {
+  border-radius: 6px;
+  padding: 8px 12px;
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  cursor: pointer;
+  font-weight: 600;
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modal improvements */
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 36, 0.12);
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* original styles below */
+/* ==========================================================================
+   Révision Espacée : système de thèmes
+   Light = crème / terracotta / marine. Dark = palette historique intacte.
+   Les accents de catégorie restent communs aux deux thèmes.
+   ========================================================================== */
+
+:root,
+[data-theme='dark'] {
+  /* --- surfaces --- */
+  --void: #0a0a0f;
+  --surface: #15151c;
+  --surface-raised: #20202a;
+  --surface-hover: #2a2a36;
+  --line: #2a2a35;
+  --line-soft: #1e1e27;
+
+  /* --- texte --- */
+  --ink: #e8e8ec;
+  --ink-dim: #7a7a8a;
+  --ink-faint: #4b4b58;
+
+  /* --- signal primaire / CTA --- */
+  --pulse: #5eead4;
+  --pulse-dim: #2c5c54;
+  --on-pulse: #0a0a0f;
+  --pulse-text: #5eead4;
+
+  /* --- statut de réussite : identique au pulse en dark, séparé en light
+     pour conserver le sens vert = acquis sans perdre le terracotta comme
+     accent primaire. --- */
+  --success: #5eead4;
+  --success-dim: #2c5c54;
+
+  /* --- états sémantiques --- */
+  --warn: #f5a623;
+  --warn-dim: #4a3616;
+  --critical: #f1556c;
+  --critical-dim: #4a1e26;
+}
+
+[data-theme='light'] {
+  /* --- surfaces --- */
+  --void: #f5ede4;
+  --surface: #faf6f0;
+  --surface-raised: #efe3d3;
+  --surface-hover: #e7d9c8;
+  --line: rgba(26, 35, 50, 0.14);
+  --line-soft: rgba(26, 35, 50, 0.1);
+
+  /* --- texte : marine teinté, jamais gris neutre --- */
+  --ink: #1a2332;
+  --ink-dim: #4f5968;
+  --ink-faint: #707986;
+
+  /* --- terracotta = accent primaire / CTA / actif --- */
+  --pulse: #d4622a;
+  --pulse-dim: #b45122;
+  --on-pulse: #111a27;
+  --pulse-text: #9f461f;
+
+  /* --- réussite = vert, pour préserver la sémantique des statuts --- */
+  --success: #256c45;
+  --success-dim: #d4eadc;
+
+  /* --- attention / retard : lisibles sur surfaces claires --- */
+  --warn: #7f430d;
+  --warn-dim: #f3dfc8;
+  --critical: #9e2038;
+  --critical-dim: #f1d3da;
+}
+
+/* --- accents de catégorie (identification, PAS statut) ---
+   8 teintes cycliques assignées par ordre de création (accentIndex).
+   Volontairement indépendantes de pulse/success/warn/critical et communes
+   aux deux thèmes pour garder l'identité d'une catégorie stable. --- */
+:root {
+  --accent-0: #7dabf8; /* bleu */
+  --accent-1: #c792ea; /* violet */
+  --accent-2: #e8c468; /* jaune doré */
+  --accent-3: #f28fb0; /* rose */
+  --accent-4: #6dd3c7; /* cyan froid */
+  --accent-5: #9fca6b; /* vert sauge */
+  --accent-6: #e0976b; /* terracotta */
+  --accent-7: #8f9bd4; /* gris-bleu */
+
+  /* --- forme --- */
+  --radius-sm: 6px;
+  --radius-lg: 12px;
+  --speed: 0.15s;
+
+  /* --- jauge de maîtrise : le dégradé reste informatif --- */
+  --mastery-grad: linear-gradient(90deg, var(--critical) 0%, var(--warn) 50%, var(--success) 100%);
+
+  /* --- typo : 3 familles maximum --- */
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Consolas, 'Roboto Mono', monospace;
+  --font-body:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  color-scheme: dark;
+}
+html[data-theme='light'] {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--ink);
+  min-height: 100vh;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-family: var(--font-serif);
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  margin: 0 0 16px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.muted {
+  color: var(--ink-dim);
+  font-weight: 400;
+}
+.small {
+  font-size: 12px;
+}
+
+/* ---- barre du haut ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 210px;
+}
+.logo {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--pulse-dim);
+  color: var(--pulse-text);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+}
+.sub {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+}
+.offline-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  color: var(--pulse-dim);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.offline-chip::first-letter {
+  color: var(--pulse);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.tab {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--ink-dim);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition:
+    background var(--speed),
+    color var(--speed),
+    border-color var(--speed);
+}
+.tab:hover {
+  background: var(--surface-raised);
+  color: var(--ink);
+}
+.tab:active {
+  transform: translateY(1px);
+}
+.tab.active {
+  background: color-mix(in srgb, var(--pulse) 7%, var(--surface));
+  color: var(--pulse-text);
+  border-color: var(--pulse-text);
+}
+.tab:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--pulse);
+  outline-offset: 2px;
+}
+
+main {
+  padding: 28px 24px 60px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+button,
+input,
+select,
+textarea {
+  min-height: 38px;
+}
+button {
+  touch-action: manipulation;
+}
+::selection {
+  background: var(--pulse);
+  color: var(--void);
+}
+.view {
+  display: none;
+}
+.view.active {
+  display: block;
+  animation: rise 0.2s ease;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .view.active {
+    animation: none;
+  }
+  * {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
+
+/* ---- panels ---- */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+  margin-bottom: 16px;
+  contain: layout paint;
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.panel-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+}
+.panel-head-row {
+  margin-bottom: 4px;
+}
+
+/* ---- formulaires repliables (<details>/<summary>) : la création est une
+   action occasionnelle, elle ne doit pas monopoliser l'écran en
+   permanence. Repliés par défaut ; le triangle natif du navigateur est
+   supprimé et remplacé par un "+" qui devient discrètement actif à
+   l'ouverture, cohérent avec le reste des boutons de l'app. ---- */
+.collapsible-form {
+  margin-top: 16px;
+}
+.collapsible-form summary {
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  padding: 8px 0;
+  transition: color var(--speed);
+  user-select: none;
+}
+.collapsible-form summary::-webkit-details-marker {
+  display: none;
+}
+.collapsible-form summary:hover {
+  color: var(--ink);
+}
+.collapsible-form[open] summary {
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.collapsible-form > form,
+.collapsible-form > .form-row-secondary,
+.collapsible-form > p {
+  margin-top: 14px;
+}
+.collapsible-form > form:first-of-type {
+  margin-top: 0;
+}
+.summary-h2 {
+  display: inline;
+  font-size: 15px;
+  margin: 0;
+  font-family: var(--font-serif);
+}
+
+/* ---- formulaires ---- */
+.form-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.form-row-secondary {
+  margin-top: 14px;
+  align-items: stretch;
+}
+.label-wide {
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+
+/* ---- panneau catégories : léger accent pour le distinguer visuellement
+   du panneau "ajouter un module" juste en dessous, sans pour autant
+   rivaliser avec les couleurs de statut (vert/rouge) qui restent le
+   signal principal de l'app ---- */
+.panel-category {
+  border-color: var(--line);
+  border-left-color: var(--line);
+}
+.panel-category.has-categories {
+  border-left-color: var(--accent-2);
+}
+#moduleFormPanel {
+  border-left-color: var(--pulse);
+}
+.dashboard-primary {
+  border-left-color: var(--line);
+}
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+.category-chip .mastery-pill {
+  width: 60px;
+  height: 14px;
+}
+.category-chip .mastery-pill-label {
+  font-size: 9px;
+}
+.category-chip-empty {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* ---- accents de catégorie : pastille ronde + liseré de carte UNIQUEMENT.
+   Jamais de fond plein, jamais de couleur de texte principal : ça
+   resterait un simple repère d'identification, discret, qui ne dispute
+   jamais l'attention aux signaux de statut (vert=compris/rouge=à revoir)
+   ni à la jauge de maîtrise. ---- */
+.accent-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+.accent-0 {
+  background: var(--accent-0);
+}
+.accent-1 {
+  background: var(--accent-1);
+}
+.accent-2 {
+  background: var(--accent-2);
+}
+.accent-3 {
+  background: var(--accent-3);
+}
+.accent-4 {
+  background: var(--accent-4);
+}
+.accent-5 {
+  background: var(--accent-5);
+}
+.accent-6 {
+  background: var(--accent-6);
+}
+.accent-7 {
+  background: var(--accent-7);
+}
+
+/* liseré de carte : un module hérite du fin liseré coloré de sa
+   catégorie d'appartenance, pour tracer visuellement "à quel univers
+   ça appartient" sans jamais changer le fond ni le texte de la carte */
+.accent-border-0 {
+  border-left-color: var(--accent-0) !important;
+}
+.accent-border-1 {
+  border-left-color: var(--accent-1) !important;
+}
+.accent-border-2 {
+  border-left-color: var(--accent-2) !important;
+}
+.accent-border-3 {
+  border-left-color: var(--accent-3) !important;
+}
+.accent-border-4 {
+  border-left-color: var(--accent-4) !important;
+}
+.accent-border-5 {
+  border-left-color: var(--accent-5) !important;
+}
+.accent-border-6 {
+  border-left-color: var(--accent-6) !important;
+}
+.accent-border-7 {
+  border-left-color: var(--accent-7) !important;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-dim);
+  flex: 1;
+  min-width: 150px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+input,
+select,
+textarea {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  outline: none;
+  transition: border-color var(--speed);
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--pulse);
+}
+textarea {
+  resize: vertical;
+  min-height: 64px;
+  font-family: var(--font-body);
+}
+.search {
+  min-width: 220px;
+}
+::placeholder {
+  color: var(--ink-faint);
+}
+
+/* ---- boutons ---- */
+.btn {
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  transition:
+    border-color var(--speed),
+    background var(--speed),
+    transform var(--speed);
+}
+.btn:hover {
+  background: var(--surface-raised);
+  border-color: var(--pulse);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn-primary {
+  background: var(--pulse);
+  border-color: var(--pulse);
+  color: var(--on-pulse);
+}
+.btn-primary:hover {
+  background: var(--pulse);
+  filter: brightness(1.08);
+  border-color: var(--pulse);
+}
+.btn-success {
+  background: transparent;
+  border-color: var(--success);
+  color: var(--success);
+}
+.btn-success:hover {
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+  border-color: var(--success);
+}
+.btn-danger {
+  background: transparent;
+  border-color: var(--critical-dim);
+  color: var(--critical);
+}
+.btn-danger:hover {
+  background: color-mix(in srgb, var(--critical) 10%, transparent);
+  border-color: var(--critical);
+}
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn-row.end {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* ---- cards ---- */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  transition: border-color var(--speed);
+}
+.card:hover {
+  border-color: var(--ink-faint);
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.card-title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+/* le bord gauche des cartes de module (jamais les catégories, qui ont
+   leur propre traitement) est épaissi pour porter le liseré de couleur
+   hérité de la catégorie parente : .accent-border-N ne fait que changer
+   sa TEINTE, jamais son épaisseur ni celle des 3 autres côtés */
+.node-card:not(.category-card) {
+  border-left-width: 3px;
+}
+
+/* ---- carte de catégorie : sommet de la hiérarchie, légèrement mise en
+   avant (bordure supérieure plus marquée) sans rivaliser avec les
+   couleurs de statut qui restent le signal principal ---- */
+.category-card {
+  border-top: 2px solid var(--ink-faint);
+}
+.category-card .card-title {
+  font-size: 15px;
+}
+.mastery-readout {
+  padding-top: 10px;
+}
+.mastery-readout .mastery-track {
+  opacity: 0.55;
+}
+.mastery-readout-label {
+  margin-top: 8px;
+}
+
+/* ---- timeline des échéances (élément signature) ----
+   Chaque module trace une frise J+1 / J+7 / J+21 / J+60 : un point par
+   échéance relié par un trait, l'état de la mémoire visible d'un coup d'œil. */
+.steps {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 2px;
+  overflow-x: auto;
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1 0 88px;
+  min-width: 88px;
+  cursor: default;
+  font-family: var(--font-mono);
+}
+.step-dot {
+  position: relative;
+  width: 100%;
+  height: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-dot::before {
+  /* trait reliant les points, plein largeur, sous le point */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--line);
+  z-index: 0;
+}
+.step:first-child .step-dot::before {
+  left: 50%;
+}
+.step:last-child .step-dot::before {
+  right: 50%;
+}
+.step-dot::after {
+  content: '';
+  display: block;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--void);
+  border: 2px solid var(--line);
+  z-index: 1;
+  transition:
+    background-color var(--speed),
+    border-color var(--speed),
+    transform var(--speed);
+}
+.step .step-label {
+  position: relative;
+  font-size: 10px;
+  color: var(--ink-faint);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.step-label[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  background: var(--void);
+  color: var(--ink);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  font-size: 11px;
+  z-index: 5;
+  border: 1px solid var(--line);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+}
+.step.done .step-dot::after {
+  background: var(--success);
+  border-color: var(--success);
+}
+.step.done .step-label {
+  color: var(--success);
+}
+.step.late .step-dot::after {
+  background: var(--critical);
+  border-color: var(--critical);
+}
+.step.late .step-label {
+  color: var(--critical);
+}
+.step.today .step-dot::after {
+  background: var(--warn);
+  border-color: var(--warn);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warn) 18%, transparent);
+}
+.step.today .step-label {
+  color: var(--warn);
+}
+
+/* ---- badges de statut ---- */
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge-todo {
+  background: var(--surface-hover);
+  color: var(--ink-dim);
+  border-color: var(--line);
+}
+.badge-due {
+  background: var(--warn-dim);
+  color: var(--warn);
+}
+.badge-done {
+  background: var(--success-dim);
+  color: var(--success);
+}
+.badge-late {
+  background: var(--critical-dim);
+  color: var(--critical);
+}
+.badge-category {
+  background: var(--surface-hover);
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}
+
+/* ---- formulaire de révision (vue Aujourd'hui) ---- */
+.rev-form {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.choices {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.choice {
+  cursor: pointer;
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-dim);
+  transition:
+    border-color var(--speed),
+    color var(--speed),
+    background var(--speed);
+  flex: 0 0 auto;
+}
+.choice input {
+  display: none;
+}
+.choice:hover {
+  border-color: var(--ink-faint);
+  color: var(--ink);
+}
+.choice.sel-yes {
+  background: var(--pulse-dim);
+  color: var(--pulse);
+  border-color: var(--pulse);
+}
+.choice.sel-partial {
+  background: var(--warn-dim);
+  color: var(--warn);
+  border-color: var(--warn);
+}
+.choice.sel-no {
+  background: var(--critical-dim);
+  color: var(--critical);
+  border-color: var(--critical);
+}
+
+/* ---- statistiques ---- */
+/* le conteneur RACINE des stats n'est PAS une grille lui-même : il ne
+   fait qu'empiler ses sections verticalement, l'une après l'autre. Seules
+   les sous-grilles à l'intérieur de chaque section (stats-grid) répartissent
+   leurs propres cartes en colonnes. Sans cette distinction, le conteneur
+   racine traitait chaque section comme une simple cellule de grille et les
+   alignait toutes côte à côte au lieu de les empiler. */
+.stats-container {
+  display: block;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+.stat {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 13px 14px;
+}
+.stat .val {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: var(--font-serif);
+  color: var(--ink);
+}
+.stat-status-row .val {
+  font-family: var(--font-serif);
+}
+.stat .lbl {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-top: 4px;
+}
+.bar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+  margin-top: 12px;
+}
+.bar > i {
+  display: block;
+  height: 100%;
+  background: var(--pulse);
+  transition: width 0.4s ease;
+}
+
+/* ---- modale ---- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 8, 0.75);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+  animation: rise 0.12s ease;
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  width: min(440px, 92vw);
+}
+.modal .search {
+  width: 100%;
+  margin-top: 12px;
+}
+.modal #modalText {
+  white-space: pre-line;
+}
+
+/* ---- toast ---- */
+.toast {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--pulse);
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  z-index: 60;
+  font-size: 13px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  animation: rise 0.15s ease;
+}
+
+/* ---- bandeau d'alerte de retard : gravité progressive selon le pire
+   retard trouvé (pas une moyenne). Toujours en tout premier sur le
+   Dashboard, avant même les catégories, pour qu'un retard ne puisse
+   jamais passer inaperçu à l'ouverture : sans notification système,
+   cette app tournant en local et hors-ligne (voir README). ---- */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  margin-bottom: 18px;
+  font-size: 13px;
+  animation: rise 0.2s ease;
+}
+.alert-icon {
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+.alert-text {
+  flex: 1;
+  min-width: 200px;
+}
+.alert-goto {
+  flex: 0 0 auto;
+}
+
+.alert-light {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+}
+.alert-light .alert-icon {
+  color: var(--ink-faint);
+}
+
+.alert-moderate {
+  background: var(--warn-dim);
+  border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent);
+  color: var(--ink);
+}
+.alert-moderate .alert-icon {
+  color: var(--warn);
+}
+
+.alert-severe {
+  background: var(--critical-dim);
+  border: 1px solid color-mix(in srgb, var(--critical) 45%, transparent);
+  color: var(--ink);
+  font-weight: 600;
+  animation:
+    rise 0.2s ease,
+    alert-pulse 2.4s ease-in-out infinite;
+}
+.alert-severe .alert-icon {
+  color: var(--critical);
+}
+@keyframes alert-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--critical) 25%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--critical) 0%, transparent);
+  }
+}
+
+.empty {
+  color: var(--ink-faint);
+  padding: 32px 18px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+  font-size: 13px;
+}
+
+/* ---- état vide de la vue Aujourd'hui : centré, positif, avec repère
+   temporel plutôt qu'un simple message perdu dans un grand espace vide
+   (particulièrement visible sur un écran large). ---- */
+
+.module-empty-title {
+  font: 700 17px/1.2 var(--font-serif);
+  color: var(--ink);
+}
+.module-empty-copy {
+  max-width: 52ch;
+  margin: 6px auto 12px;
+  color: var(--ink-dim);
+}
+.module-empty .btn,
+.history-empty .btn {
+  margin-top: 2px;
+}
+
+.today-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 24px;
+  gap: 10px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+.today-empty-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pulse-dim);
+  color: var(--pulse);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.today-empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.today-empty-sub {
+  font-size: 13px;
+  color: var(--ink-dim);
+  max-width: 44ch;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---- hint sous formulaire ---- */
+.hint {
+  margin-top: 10px;
+}
+
+/* ---- barre d'outils de l'arbre ---- */
+.tree-toolbar {
+  align-items: center;
+}
+
+/* ---- arbre récursif de modules ----
+   Chaque profondeur ajoute une marge à gauche et une ligne verticale
+   discrète qui trace la hiérarchie, pour qu'un module et ses
+   sous-sous-modules restent lisibles même sur plusieurs niveaux. */
+.node-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.node-children {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: 14px;
+  padding-left: 14px;
+  border-left: 2px solid var(--line);
+}
+.node-card.depth-1 {
+  border-color: var(--line);
+}
+.node-card.depth-2,
+.node-card.depth-3,
+.node-card.depth-4 {
+  background: var(--surface);
+}
+
+.node-title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.tree-toggle {
+  background: transparent;
+  border: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--speed),
+    background var(--speed);
+}
+.tree-toggle:hover {
+  color: var(--ink);
+  background: var(--surface-hover);
+}
+.tree-toggle-leaf {
+  color: var(--ink-faint);
+  cursor: default;
+}
+.tree-toggle-leaf:hover {
+  background: transparent;
+  color: var(--ink-faint);
+}
+.node-count {
+  font-family: var(--font-mono);
+}
+.node-left {
+  flex: 1;
+  min-width: 0;
+}
+.node-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.node-actions {
+  justify-content: flex-end;
+}
+.breadcrumb {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  margin-bottom: 2px;
+}
+
+/* ---- bouton "voir le détail" : sépare clairement la vue repliée
+   (consultative, un coup d'œil suffit) du détail complet (description,
+   jauge éditable, timeline, actions) qui n'apparaît qu'à la demande.
+   Discret par défaut, ne doit jamais rivaliser avec les vrais boutons
+   d'action (+ compris / supprimer). ---- */
+.detail-toggle {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  color: var(--ink-dim);
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  padding: 4px 0;
+  transition: color var(--speed);
+}
+.detail-toggle:hover {
+  color: var(--ink);
+}
+.node-detail {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ---- points de statut : compris (vert) / à revoir (rouge) / neutre ---- */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--ink-faint);
+}
+.status-learned {
+  background: var(--success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 16%, transparent);
+}
+.status-review {
+  background: var(--critical);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--critical) 16%, transparent);
+}
+.status-unset {
+  background: var(--ink-faint);
+}
+
+/* ---- pastille compacte de maîtrise (utilisée sur les cartes) ---- */
+.mastery-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 96px;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface-hover);
+  border: 1px solid var(--line);
+}
+.mastery-pill i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--mastery-grad);
+  background-size: 100px 100%;
+  transition: width 0.28s ease;
+}
+.mastery-pill-label {
+  position: relative;
+  margin-left: auto;
+  margin-right: 7px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink);
+  /* text-shadow plutôt que mix-blend-mode:difference : ce dernier donne un
+     rendu imprévisible et peu lisible selon la couleur exacte du dégradé
+     sous le texte (observé notamment sur les tons orange/rouge de la
+     jauge) : une ombre portée garantit un contraste minimum quel que
+     soit le fond, de façon stable et prévisible. */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* ---- jauge de maîtrise interactive (rouge -> vert), point 4 ----
+   Piste avec un peu de marge horizontale interne (padding) pour que le
+   curseur reste entièrement visible même aux bornes 0 % et 100 % : sans
+   ce padding, translate(-50%) pousse la moitié du curseur hors du
+   conteneur exactement comme un <input type=range> mal stylé. */
+.mastery-controls {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.mastery-track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  margin: 0 7px; /* == rayon du curseur, pour qu'il ne déborde jamais */
+  background: var(--mastery-grad);
+  opacity: 0.35;
+}
+.mastery-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 999px;
+  background: var(--mastery-grad);
+  background-size: 400px 100%;
+  transition: width 0.3s ease;
+}
+.mastery-handle {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--void);
+  border: 2px solid var(--ink);
+  transform: translate(-50%, -50%);
+  transition: left 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.18);
+}
+.mastery-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.mastery-value {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  letter-spacing: 0.03em;
+}
+
+/* ---- blocs de texte éditables : description + "à retenir vraiment" ----
+   .takeaway-block reprend la même structure mais avec un accent visuel
+   (bordure gauche colorée) pour que le point clé saute aux yeux dans une
+   carte dense, sans pour autant crier plus fort que le statut compris/à
+   revoir qui reste le signal principal. */
+.text-block {
+  margin-top: 12px;
+}
+.text-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.text-block-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.text-block-edit {
+  background: transparent;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 2px 4px;
+  transition: color var(--speed);
+}
+.text-block-edit:hover {
+  color: var(--ink);
+}
+.text-block-merged {
+  display: block;
+  margin-top: 12px;
+  padding: 0;
+  font-size: 11px;
+  text-align: left;
+}
+.text-block-value {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.text-block-empty .text-block-head {
+  opacity: 0.7;
+}
+.text-block-input {
+  width: 100%;
+  margin-top: 6px;
+  font-size: 13px;
+  min-height: 56px;
+}
+.text-block-actions {
+  margin-top: 8px;
+}
+
+.takeaway-block {
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--warn);
+  background: var(--surface);
+}
+.takeaway-block .text-block-value {
+  color: var(--ink);
+}
+
+/* ---- sections de statistiques : chaque section pose une vraie question
+   avant d'afficher ses chiffres, pour donner du sens aux métriques plutôt
+   que les balancer à plat (rétention, zone critique... n'ont rien
+   d'intuitif sans un minimum de contexte). ---- */
+.stats-section-head {
+  margin: 18px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.stats-section-head:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.stats-subhead {
+  margin: 0;
+}
+.stats-explain {
+  margin-top: 6px;
+  line-height: 1.5;
+  max-width: 72ch;
+}
+.stats-grid-secondary {
+  margin-top: 12px;
+}
+.stat-category-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-bottom: 8px;
+}
+.stat-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stat-learned .val {
+  color: var(--success);
+}
+.stat-review .val {
+  color: var(--critical);
+}
+.bar-learned {
+  background: var(--success) !important;
+}
+.bar-review {
+  background: var(--critical) !important;
+}
+.bar-unset {
+  background: var(--ink-faint) !important;
+}
+
+/* ---- liste des leçons critiques (statistiques) ---- */
+.critical-list {
+  margin-top: 12px;
+}
+.critical-row {
+  padding: 12px 16px;
+}
+
+/* ---- historique : groupé par période, deux types d'évènements
+   distincts (révision effectuée vs jauge de maîtrise ajustée). Le
+   liseré diffère en STYLE (plein vs pointillé) plutôt qu'en couleur
+   vive, pour rester lisible sans ajouter un nouveau signal de couleur
+   qui viendrait concurrencer statut/catégorie. ---- */
+.history-period-head {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 18px 0 8px;
+}
+.history-period-head:first-child {
+  margin-top: 0;
+}
+.history-row {
+  border-left-width: 3px;
+  padding: 11px 14px;
+}
+.history-review {
+  border-left-style: solid;
+  border-left-color: var(--ink-faint);
+}
+.history-mastery {
+  border-left-style: dashed;
+  border-left-color: var(--ink-faint);
+}
+.history-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.history-kind-icon {
+  font-size: 13px;
+  color: var(--ink-faint);
+  flex: 0 0 auto;
+  width: 16px;
+  text-align: center;
+}
+.history-sub-line {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.history-trend {
+  font-weight: 700;
+}
+.history-trend-up {
+  color: var(--success);
+}
+.history-trend-down {
+  color: var(--critical);
+}
+.history-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+.history-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.history-legend-swatch {
+  width: 14px;
+  height: 3px;
+}
+.history-legend-swatch.review {
+  background: var(--ink-faint);
+}
+.history-legend-swatch.mastery {
+  background: transparent;
+  border-top: 2px dashed var(--ink-faint);
+}
+
+/* ---- transitions de thème + cartes à contraste inversé ---- */
+html.theme-transitioning body,
+html.theme-transitioning .topbar,
+html.theme-transitioning .panel,
+html.theme-transitioning .card,
+html.theme-transitioning .modal,
+html.theme-transitioning .toast,
+html.theme-transitioning .tab,
+html.theme-transitioning input,
+html.theme-transitioning select,
+html.theme-transitioning textarea,
+html.theme-transitioning .category-chip,
+html.theme-transitioning .section-count,
+html.theme-transitioning .detail-toggle,
+html.theme-transitioning .collapsible-form summary,
+html.theme-transitioning .tree-toggle,
+html.theme-transitioning .choice {
+  transition-property: background-color, color, border-color, box-shadow;
+  transition-duration: var(--speed);
+}
+.inverse-card {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border-color: var(--line);
+}
+[data-theme='light'] .inverse-card {
+  background: #1a2332;
+  color: #faf6f0;
+  border-color: #1a2332;
+}
+[data-theme='light'] .inverse-card h2,
+[data-theme='light'] .inverse-card .muted,
+[data-theme='light'] .inverse-card .small,
+[data-theme='light'] .inverse-card .card-title,
+[data-theme='light'] .inverse-card .today-empty-sub {
+  color: #faf6f0;
+}
+.theme-toggle {
+  flex: 0 0 auto;
+  width: 38px;
+  min-width: 38px;
+  padding: 7px 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+}
+.theme-toggle-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+.shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink-faint);
+  background: transparent;
+  font: 9px var(--font-mono);
+  line-height: 1;
+}
+.tab .shortcut-key {
+  opacity: 0.45;
+  transition:
+    opacity var(--speed),
+    color var(--speed),
+    border-color var(--speed);
+}
+.tab:hover .shortcut-key,
+.tab.active .shortcut-key {
+  opacity: 1;
+}
+.toast-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.toast-action {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: transparent;
+  color: var(--pulse);
+  font: 600 11px var(--font-mono);
+  cursor: pointer;
+}
+.toast-action:hover {
+  background: color-mix(in srgb, var(--pulse) 10%, transparent);
+}
+.stat-primary {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.stat-primary .bar > i {
+  background: var(--success);
+}
+[data-theme='light'] .stat-primary {
+  background: #1a2332;
+  color: #faf6f0;
+  border-color: #1a2332;
+}
+[data-theme='light'] .stat-primary .val,
+[data-theme='light'] .stat-primary .lbl {
+  color: #faf6f0;
+}
+[data-theme='light'] .stat-primary .bar {
+  background: rgba(250, 246, 240, 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .topbar,
+  .panel,
+  .card,
+  .modal,
+  .toast,
+  .tab,
+  input,
+  select,
+  textarea,
+  .category-chip,
+  .section-count,
+  .detail-toggle,
+  .collapsible-form summary,
+  .tree-toggle,
+  .choice {
+    transition: none !important;
+  }
+}
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  header.topbar {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .brand {
+    min-width: 0;
+    flex: 1;
+  }
+  .tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 720px) {
+  header.topbar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand {
+    min-width: 0;
+  }
+  main {
+    padding: 18px 14px 48px;
+  }
+  .form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  label {
+    min-width: 0;
+  }
+  .node-children {
+    margin-left: 10px;
+    padding-left: 10px;
+  }
+  .tree-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .tree-toolbar .search,
+  .tree-toolbar select {
+    width: 100%;
+  }
+  /* le titre + compteur ont besoin de toute la largeur pour ne jamais
+     isoler le compteur sur sa propre ligne (cas des noms longs) : le
+     badge/jauge de droite passe systématiquement en dessous plutôt que
+     de lutter pour la même ligne horizontale */
+  .card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .node-card .node-right {
+    align-items: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .node-right .btn-row {
+    flex: 1;
+  }
+  .mastery-pill {
+    width: auto;
+    min-width: 96px;
+  }
+  .node-card .card-title {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+/* Très gros arbres : la densité augmente automatiquement sans sacrifier la
+   hiérarchie. Les modules restent détaillés seulement à la demande. */
+.tree-list.tree-volume-medium .node-children-depth-1 {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.tree-list.tree-volume-high .node-children-depth-1 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.tree-list.tree-volume-high .node-wrap {
+  gap: 6px;
+}
+.tree-list.tree-volume-high .node-children {
+  gap: 6px;
+}
+.tree-list.tree-volume-high .node-card {
+  padding: 11px 13px;
+}
+.tree-list.tree-volume-high .detail-toggle {
+  margin-top: 5px;
+}
+.tree-list.tree-volume-high .node-children-depth-2,
+.tree-list.tree-volume-high .node-children-depth-3,
+.tree-list.tree-volume-high .node-children-depth-4 {
+  gap: 6px;
+}
+
+@media (max-width: 1100px) {
+  .tree-list.tree-volume-high .node-children-depth-1 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .tree-list.tree-volume-medium .node-children-depth-1,
+  .tree-list.tree-volume-high .node-children-depth-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Rendu progressif : même un arbre massif reste visuellement respirable. */
+.tree-more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  position: relative;
+}
+.tree-more .muted {
+  flex: 1;
+  min-width: 0;
+}
+.modal:focus {
+  outline: none;
+}
+@media (max-width: 720px) {
+  .tree-more {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .tree-more .btn {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   EMPTY STATES + DENSITÉ V4
+   -------------------------------------------------------------------------- */
+.dashboard-overview {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.dashboard-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  min-height: 94px;
+}
+.dashboard-summary-card.is-alert {
+  border-top-color: var(--critical);
+}
+.dashboard-summary-card.is-primary {
+  border-top-color: var(--pulse);
+}
+.dashboard-summary-label {
+  color: var(--ink-dim);
+  font: 10px var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.dashboard-summary-value {
+  display: block;
+  margin-top: 4px;
+  font: 700 28px/1 var(--font-serif);
+  color: var(--ink);
+}
+.dashboard-summary-sub {
+  margin-top: 7px;
+  color: var(--ink-dim);
+  font-size: 11px;
+}
+.dashboard-summary-action {
+  margin-top: 9px;
+}
+.dashboard-first-run {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--pulse);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 22px;
+}
+.dashboard-first-run-kicker {
+  font: 10px var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pulse);
+}
+.dashboard-first-run-title {
+  margin-top: 5px;
+  font: 700 24px/1.1 var(--font-serif);
+}
+.dashboard-first-run-copy {
+  margin: 8px 0 0;
+  max-width: 66ch;
+  color: var(--ink-dim);
+}
+.dashboard-first-run-flow {
+  margin-top: 12px;
+  font: 10px var(--font-mono);
+  color: var(--ink-faint);
+}
+.dashboard-first-run-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.view-dashboard.is-first-run > .panel-category,
+.view-dashboard.is-first-run > #moduleFormPanel,
+.view-dashboard.is-first-run > .dashboard-primary {
+  opacity: 0.58;
+}
+.view-dashboard.is-first-run > .panel-category {
+  grid-column: 1 / -1;
+}
+.view-dashboard.is-first-run > #moduleFormPanel,
+.view-dashboard.is-first-run > .dashboard-primary {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   DISPOSITION V3
+   -------------------------------------------------------------------------- */
+.view-dashboard.active,
+.view-stats.active {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.view-dashboard.active > .alert-banner {
+  grid-column: 1 / -1;
+}
+.view-dashboard.active > .dashboard-primary {
+  grid-column: span 2;
+}
+.view-dashboard.active > .panel {
+  margin-bottom: 0;
+}
+.view-dashboard .dashboard-primary .tree-list {
+  margin-top: 6px;
+}
+
+.view-today.active {
+  display: block;
+}
+.view-today.active > .panel {
+  margin-bottom: 0;
+}
+.today-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+.today-list .card {
+  padding: 14px 16px;
+}
+.today-list .rev-form {
+  margin-top: 10px;
+}
+.today-list textarea {
+  min-height: 52px;
+}
+
+.view-history.active {
+  display: block;
+}
+.view-history .history-list {
+  gap: 7px;
+}
+.view-history .history-row {
+  padding: 11px 14px;
+  border-left-width: 3px;
+}
+.view-history .history-review {
+  border-left-style: solid;
+  border-left-color: var(--ink-faint);
+  background: color-mix(in srgb, var(--pulse) 3%, var(--surface));
+}
+.view-history .history-mastery {
+  border-left-style: dashed;
+  border-left-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 3%, var(--surface));
+}
+.view-history .history-review .history-kind-icon {
+  color: var(--pulse);
+}
+.view-history .history-mastery .history-kind-icon {
+  color: var(--warn);
+}
+.view-history .history-period-head {
+  margin: 18px 0 8px;
+}
+
+.view-stats.active > .panel {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+.view-stats .stats-container {
+  display: block;
+}
+.view-stats .stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+.view-stats .stat {
+  padding: 13px 14px;
+}
+
+.view-settings.active {
+  display: block;
+}
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.settings-grid .panel {
+  width: 100%;
+}
+.settings-panel p {
+  max-width: 68ch;
+}
+
+/* Densité progressive conservée, contextualisée pour ne pas créer de
+   doublons de composants génériques. */
+.tree-list.tree-volume-medium .node-children-depth-1 {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.tree-list.tree-volume-high .node-children-depth-1 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.tree-list.tree-volume-high .node-wrap {
+  gap: 6px;
+}
+.tree-list.tree-volume-high .node-children {
+  gap: 6px;
+}
+.tree-list.tree-volume-high .node-card {
+  padding: 11px 13px;
+}
+.tree-list.tree-volume-high .node-card .detail-toggle {
+  margin-top: 5px;
+}
+.tree-list.tree-volume-high .node-children-depth-2,
+.tree-list.tree-volume-high .node-children-depth-3,
+.tree-list.tree-volume-high .node-children-depth-4 {
+  gap: 6px;
+}
+
+@media (max-width: 1100px) {
+  .tree-list.tree-volume-high .node-children-depth-1 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .view-dashboard.active,
+  .view-stats.active {
+    grid-template-columns: 1fr;
+  }
+  .view-dashboard.active > .dashboard-primary {
+    grid-column: span 1;
+  }
+  main .panel {
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  header.topbar::after {
+    left: 0;
+    right: 0;
+  }
+  .node-card .node-right {
+    align-items: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .node-card .node-right .btn-row {
+    flex: 1;
+  }
+  .node-card .card-title {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  .node-children-depth-1,
+  .node-children-depth-2,
+  .node-children-depth-3,
+  .node-children-depth-4 {
+    margin-left: 8px;
+    padding-left: 9px;
+  }
+  .tree-toolbar .search {
+    width: auto;
+    min-width: 0;
+  }
+  .category-chips {
+    max-height: 50px;
+  }
+  .tree-list.tree-volume-medium .node-children-depth-1,
+  .tree-list.tree-volume-high .node-children-depth-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Carte à contraste inversé : une seule carte principale par surface. */
+[data-theme='light'] .view-dashboard .dashboard-primary {
+  background: var(--void);
+  color: #faf6f0;
+  border-color: var(--void);
+}
+[data-theme='light'] .view-dashboard .dashboard-primary h2,
+[data-theme='light'] .view-dashboard .dashboard-primary .muted,
+[data-theme='light'] .view-dashboard .dashboard-primary .section-count {
+  color: #faf6f0;
+}
+[data-theme='light'] .view-dashboard .dashboard-primary .section-count {
+  background: rgba(250, 246, 240, 0.08);
+  border-color: rgba(250, 246, 240, 0.18);
+}
+
+/* --- V4 : les KPI de stats restent dans la même famille de cartes que
+   le dashboard, sans transformer les sections textuelles en widgets --- */
+.view-stats .stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+.view-stats .stat {
+  min-height: 92px;
+}
+@media (max-width: 720px) {
+  .dashboard-first-run {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-first-run-actions {
+    justify-content: flex-start;
+  }
+}
+
+/* ========================================================================
+   V5 PRODUCT SHELL
+
+   Desktop productivity layout: quiet rail, focused work canvas, clear
+   information hierarchy. Existing components and behavior are preserved.
+   ======================================================================== */
+
+:root {
+  --sidebar-width: 238px;
+  --content-max: 1320px;
+  --canvas-gap: 18px;
+  --focus-ring: 2px;
+}
+
+/* Dark depth: four visibly distinct neutral layers, while keeping the
+   historical near-black foundation and the existing semantic colors. */
+[data-theme='dark'] {
+  --surface: #17171f;
+  --surface-raised: #23232d;
+  --surface-hover: #2d2d39;
+  --line: #343441;
+  --line-soft: #252530;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--void);
+}
+
+/* ------------------------------------------------------------------------
+   Left navigation rail
+   ------------------------------------------------------------------------ */
+header.topbar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  padding: 22px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 22px;
+  background: var(--surface);
+  border: 0;
+  border-right: 1px solid var(--line);
+  box-shadow: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+header.topbar::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  height: 2px;
+  background: var(--line);
+  opacity: 0.7;
+}
+
+header.topbar .brand {
+  min-width: 0;
+  width: 100%;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 2px 4px 0;
+}
+
+header.topbar .brand h1 {
+  font-size: 19px;
+  line-height: 1.08;
+}
+
+header.topbar .brand .sub {
+  line-height: 1.4;
+}
+
+header.topbar .logo {
+  flex: 0 0 auto;
+}
+
+header.topbar .tabs {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+header.topbar .tab {
+  width: 100%;
+  justify-content: flex-start;
+  min-height: 40px;
+  padding: 9px 11px;
+  gap: 9px;
+  border-color: transparent;
+  border-left: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+
+header.topbar .tab::before {
+  width: 18px;
+  flex: 0 0 18px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ink-faint);
+  font: 11px/1 var(--font-mono);
+}
+
+.tab[data-view='dashboard']::before {
+  content: '01';
+}
+.tab[data-view='today']::before {
+  content: '02';
+}
+.tab[data-view='history']::before {
+  content: '03';
+}
+.tab[data-view='stats']::before {
+  content: '04';
+}
+.tab[data-view='settings']::before {
+  content: '05';
+}
+
+header.topbar .tab.active {
+  border-left-color: var(--pulse);
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  background: color-mix(in srgb, var(--pulse) 7%, var(--surface));
+}
+
+.tab.active::before,
+.tab:hover::before {
+  color: var(--pulse-text);
+}
+
+header.topbar .theme-toggle {
+  margin-top: auto;
+  align-self: flex-end;
+  width: 40px;
+}
+
+main {
+  width: min(calc(100% - var(--sidebar-width)), var(--content-max));
+  max-width: var(--content-max);
+  margin: 0 auto 0 var(--sidebar-width);
+  padding: 34px 34px 64px;
+}
+
+/* ------------------------------------------------------------------------
+   View framing: every screen gets a quiet title rhythm before content.
+   ------------------------------------------------------------------------ */
+.view.active {
+  min-height: calc(100vh - 68px);
+}
+
+.view > .panel:last-child,
+.view > .settings-grid > .panel:last-child {
+  margin-bottom: 0;
+}
+
+/* Dashboard = briefing first, workspace second. */
+.view-dashboard.active {
+  align-content: start;
+  grid-auto-flow: row;
+  grid-auto-rows: min-content;
+}
+
+.view-dashboard .dashboard-overview {
+  gap: var(--canvas-gap);
+}
+
+.view-dashboard .dashboard-summary-card {
+  position: relative;
+  min-height: 108px;
+  padding: 16px 18px 15px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transition:
+    border-color var(--speed),
+    background var(--speed),
+    transform var(--speed);
+}
+
+.view-dashboard .dashboard-summary-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--ink-faint);
+}
+
+.view-dashboard .dashboard-summary-card.is-primary {
+  background: var(--surface-raised);
+}
+
+.view-dashboard .dashboard-summary-card.is-alert {
+  border-left: 3px solid var(--critical);
+}
+
+.view-dashboard .dashboard-summary-value {
+  font-size: 30px;
+  letter-spacing: -0.02em;
+}
+
+.view-dashboard .dashboard-summary-sub {
+  max-width: 32ch;
+}
+
+/* First run becomes the actual welcome surface instead of another panel. */
+.view-dashboard .dashboard-first-run {
+  background: var(--surface);
+  border-left-width: 5px;
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  min-height: 210px;
+}
+
+.view-dashboard .dashboard-first-run-title {
+  max-width: 18ch;
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.view-dashboard .dashboard-first-run-flow {
+  letter-spacing: 0.07em;
+}
+
+/* Category and create-module panels are setup surfaces, intentionally
+   quieter than the main module workspace. */
+.view-dashboard .panel-category,
+.view-dashboard #moduleFormPanel {
+  background: var(--surface);
+}
+
+.view-dashboard .panel-category {
+  border-left-color: var(--line);
+}
+
+.view-dashboard #moduleFormPanel {
+  border-left-width: 4px;
+}
+
+.view-dashboard .dashboard-primary {
+  min-width: 0;
+}
+
+.view-dashboard .dashboard-primary .panel-head {
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+/* Main workspace gets a more substantial canvas edge while preserving the
+   v4 inverse treatment in light mode. */
+.dashboard-primary .tree-toolbar {
+  align-items: center;
+}
+
+/* Today = focused workbench, not a KPI screen. */
+.view-today.active {
+  max-width: 1060px;
+}
+
+.view-today .inverse-card {
+  padding: 30px;
+  border-left-width: 5px;
+  border-left-color: var(--pulse);
+}
+
+.view-today .inverse-card > h2 {
+  font-size: 20px;
+  text-transform: none;
+  letter-spacing: -0.015em;
+  margin-bottom: 20px;
+}
+
+.view-today .today-list {
+  gap: 12px;
+}
+
+.today-list .card {
+  background: color-mix(in srgb, var(--surface-raised) 88%, var(--surface));
+  padding: 16px 17px;
+}
+
+/* History = reading surface. Period labels behave like editorial anchors. */
+.view-history.active {
+  max-width: 1020px;
+}
+
+.view-history > .panel {
+  padding-top: 22px;
+}
+
+.view-history .history-list {
+  gap: 6px;
+}
+
+.view-history .history-period-head {
+  margin-top: 22px;
+  padding: 7px 0 5px;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink-dim);
+}
+
+.view-history .history-row {
+  background: var(--surface-raised);
+  transition:
+    background var(--speed),
+    border-color var(--speed),
+    transform var(--speed);
+}
+
+.view-history .history-row:hover {
+  transform: translateX(2px);
+}
+
+.view-history .history-review {
+  border-left-color: var(--pulse);
+}
+
+.view-history .history-mastery {
+  border-left-color: var(--warn);
+}
+
+/* Stats = quiet analytical canvas; numbers dominate only where useful. */
+.view-stats.active {
+  max-width: var(--content-max);
+}
+
+.view-stats > .panel {
+  background: transparent;
+  border-color: transparent;
+  padding: 4px 0 0;
+}
+
+.view-stats > .panel > h2 {
+  margin-bottom: 20px;
+  font-size: 21px;
+  text-transform: none;
+  letter-spacing: -0.015em;
+}
+
+.view-stats .stat {
+  min-height: 104px;
+  padding: 16px 17px;
+  transition:
+    background var(--speed),
+    border-color var(--speed),
+    transform var(--speed);
+}
+
+.view-stats .stat:hover {
+  transform: translateY(-1px);
+  border-color: var(--ink-faint);
+}
+
+/* Settings = calm document-like stack. */
+.view-settings.active {
+  max-width: 940px;
+}
+
+.settings-panel {
+  padding: 24px 26px;
+}
+
+.settings-panel h2 {
+  font-size: 19px;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+
+/* Component weight: avoid making every internal card look like a floating
+   widget. The module tree remains dense and uses the existing progressive
+   density rules unchanged. */
+.card:hover {
+  transform: none;
+}
+
+.node-card:hover {
+  transform: translateX(1px);
+}
+
+.section-count {
+  min-width: 28px;
+  height: 24px;
+  padding-inline: 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Keep saturated color for real states/actions; structural surfaces stay
+   neutral. Category accents remain reserved for actual category identity. */
+[data-theme='light'] .panel-category.has-categories {
+  border-left-color: var(--line);
+}
+
+[data-theme='dark'] .panel-category.has-categories {
+  border-left-color: var(--line);
+}
+
+/* Keyboard focus is deliberately stronger on the navigation rail. */
+.tab:focus-visible,
+.theme-toggle:focus-visible {
+  outline: var(--focus-ring) solid var(--pulse);
+  outline-offset: 2px;
+}
+
+/* Mobile keeps the same information architecture but restores a horizontal
+   header, because a persistent rail would consume too much workspace. */
+@media (max-width: 900px) {
+  header.topbar {
+    position: sticky;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    overflow: visible;
+  }
+
+  header.topbar::after {
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 2px;
+  }
+
+  header.topbar .brand {
+    min-width: 0;
+    flex: 1;
+    width: auto;
+    padding: 0;
+  }
+
+  header.topbar .tabs {
+    flex-direction: row;
+    flex: 1;
+    width: auto;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  header.topbar .tab {
+    width: auto;
+    justify-content: center;
+    border-left-width: 1px;
+    border-bottom: 2px solid transparent;
+    flex: 0 0 auto;
+  }
+
+  header.topbar .tab::before {
+    display: none;
+  }
+
+  header.topbar .tab.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--pulse);
+  }
+
+  header.topbar .theme-toggle {
+    margin-top: 0;
+  }
+
+  main {
+    width: 100%;
+    margin-left: 0;
+    padding: 24px 20px 52px;
+  }
+}
+
+@media (max-width: 720px) {
+  header.topbar .brand h1 {
+    font-size: 17px;
+  }
+  header.topbar .brand .sub {
+    display: none;
+  }
+  header.topbar .tabs {
+    flex: 0 1 auto;
+  }
+  header.topbar .tab {
+    padding-inline: 9px;
+  }
+  .shortcut-key {
+    display: none;
+  }
+  .view-dashboard .dashboard-summary-card {
+    min-height: 92px;
+  }
+  .view-dashboard .dashboard-first-run {
+    min-height: 0;
+    padding: 22px;
+  }
+  .view-today .inverse-card {
+    padding: 20px 16px;
+  }
+  main {
+    padding-inline: 14px;
+  }
+}
+/* ========================================================================
+   V6 EDITORIAL PRODUCT COMPOSITION
+   Inspiration: the supplied reference image. The app keeps its existing
+   components and behavior, but adopts the reference's asymmetry, dark/light
+   split, editorial type, quiet navigation, and strong focal surface.
+   ======================================================================== */
+:root {
+  --editorial-max: 1380px;
+  --editorial-gap: 20px;
+  --editorial-rail: #1a2332;
+  --editorial-soft: #f0e4d6;
+}
+
+/* The supplied reference uses a strong dark structural block against a warm
+   light canvas. In light mode the rail becomes that structural block; in dark
+   mode it simply deepens the existing dark hierarchy. */
+[data-theme='light'] header.topbar {
+  background: var(--editorial-rail);
+  border-right-color: rgba(250, 246, 240, 0.12);
+  color: #faf6f0;
+}
+[data-theme='light'] header.topbar .brand h1,
+[data-theme='light'] header.topbar .brand .sub,
+[data-theme='light'] header.topbar .tab,
+[data-theme='light'] header.topbar .theme-toggle {
+  color: #faf6f0;
+}
+[data-theme='light'] header.topbar .sub,
+[data-theme='light'] header.topbar .tab::before {
+  color: rgba(250, 246, 240, 0.58);
+}
+[data-theme='light'] header.topbar .tab:hover {
+  background: rgba(250, 246, 240, 0.08);
+  color: #faf6f0;
+}
+[data-theme='light'] header.topbar .tab.active {
+  background: rgba(250, 246, 240, 0.08);
+  color: #faf6f0;
+  border-left-color: var(--pulse);
+}
+[data-theme='light'] header.topbar .tab.active::before,
+[data-theme='light'] header.topbar .tab:hover::before {
+  color: var(--pulse);
+}
+[data-theme='light'] header.topbar .logo {
+  background: rgba(250, 246, 240, 0.07);
+  border-color: rgba(250, 246, 240, 0.2);
+  color: #faf6f0;
+}
+[data-theme='light'] header.topbar .theme-toggle {
+  background: rgba(250, 246, 240, 0.06);
+  border-color: rgba(250, 246, 240, 0.18);
+}
+[data-theme='light'] header.topbar::after {
+  background: var(--pulse);
+  opacity: 0.75;
+}
+
+main {
+  width: min(calc(100% - var(--sidebar-width)), var(--editorial-max));
+  padding: 42px 40px 72px;
+}
+
+/* Shared editorial lead-in: small mono eyebrow + large serif sentence.
+   The reference poster uses this exact contrast in scale and family. */
+.view-intro {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 4px 0 8px;
+  margin-bottom: 8px;
+  max-width: 900px;
+}
+.view-kicker {
+  font: 10px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  color: var(--pulse-text);
+  text-transform: uppercase;
+}
+.view-title {
+  margin: 0;
+  max-width: 17ch;
+  font: 600 clamp(29px, 3.1vw, 46px)/1.02 var(--font-serif);
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+.view-lede {
+  max-width: 66ch;
+  margin: 10px 0 0;
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+.view-title-row::after {
+  content: '↗';
+  position: absolute;
+  right: 0;
+  top: 18px;
+  color: var(--ink-faint);
+  font: 21px/1 var(--font-mono);
+}
+
+/* Dashboard composition: one large decision surface, two compact support
+   facts, then setup/workspace surfaces. This mirrors the supplied image's
+   large editorial block beside a compact information column. */
+.view-dashboard.active {
+  display: grid;
+  grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
+  gap: var(--editorial-gap);
+}
+.view-dashboard.active > .view-intro,
+.view-dashboard.active > .alert-banner,
+.view-dashboard.active > .dashboard-first-run,
+.view-dashboard.active > .dashboard-overview,
+.view-dashboard.active > .dashboard-primary {
+  grid-column: 1 / -1;
+}
+.view-dashboard.active > .panel-category,
+.view-dashboard.active > #moduleFormPanel {
+  margin-bottom: 0;
+}
+.view-dashboard .dashboard-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) repeat(2, minmax(0, 0.85fr));
+  gap: 12px;
+}
+.view-dashboard .dashboard-summary-card {
+  min-height: 132px;
+  padding: 19px 20px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+.view-dashboard .dashboard-summary-card:first-child {
+  grid-row: span 2;
+  min-height: 276px;
+  padding: 24px 24px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-top-color: var(--pulse);
+  background: var(--surface-raised);
+}
+.view-dashboard .dashboard-summary-card:first-child .dashboard-summary-value {
+  font-size: clamp(42px, 5vw, 62px);
+  line-height: 0.96;
+}
+.view-dashboard .dashboard-summary-card:first-child .dashboard-summary-sub {
+  max-width: 23ch;
+  font-size: 12px;
+}
+[data-theme='light'] .view-dashboard .dashboard-summary-card:first-child {
+  background: var(--editorial-rail);
+  border-color: var(--editorial-rail);
+  color: #faf6f0;
+}
+[data-theme='light'] .view-dashboard .dashboard-summary-card:first-child .dashboard-summary-label,
+[data-theme='light'] .view-dashboard .dashboard-summary-card:first-child .dashboard-summary-sub,
+[data-theme='light'] .view-dashboard .dashboard-summary-card:first-child .dashboard-summary-value {
+  color: #faf6f0;
+}
+.view-dashboard .panel-category,
+.view-dashboard #moduleFormPanel {
+  min-height: 100%;
+}
+.view-dashboard .dashboard-primary {
+  margin-top: 2px;
+  padding: 28px;
+}
+.view-dashboard .dashboard-primary .panel-head {
+  align-items: flex-end;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+.view-dashboard .dashboard-primary .panel-head h2 {
+  font-size: 18px;
+}
+
+/* The long module workspace gets the strongest edge, like the main product
+   area in the reference image, while its child cards stay quiet. */
+[data-theme='light'] .view-dashboard .dashboard-primary {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--pulse);
+}
+[data-theme='light'] .view-dashboard .dashboard-primary h2,
+[data-theme='light'] .view-dashboard .dashboard-primary .muted,
+[data-theme='light'] .view-dashboard .dashboard-primary .section-count {
+  color: var(--ink);
+}
+
+/* Today: one focused stage, with the action area visually separated from
+   explanatory copy and review cards treated as working rows, not widgets. */
+.view-today.active,
+.view-history.active,
+.view-stats.active,
+.view-settings.active {
+  display: block;
+}
+.view-today .view-intro,
+.view-history .view-intro,
+.view-stats .view-intro,
+.view-settings .view-intro {
+  margin-bottom: 18px;
+}
+.view-today .inverse-card {
+  min-height: 420px;
+  padding: 28px;
+  border-left-width: 6px;
+  display: flex;
+  flex-direction: column;
+}
+.view-today .inverse-card > h2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: baseline;
+  font-size: 21px;
+  margin-bottom: 18px;
+}
+.view-today .today-list {
+  flex: 1;
+  align-content: start;
+}
+
+/* History: editorial date anchors on the left, event details on the right. */
+.view-history.active {
+  max-width: 1040px;
+}
+.view-history > .panel {
+  padding: 26px 28px 30px;
+}
+.view-history .history-period-head {
+  position: sticky;
+  top: 12px;
+  z-index: 2;
+  width: fit-content;
+  padding: 4px 8px;
+  margin: 18px 0 7px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font: 10px/1 var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.view-history .history-row {
+  min-height: 64px;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+}
+.view-history .history-row + .history-row {
+  border-top-color: var(--line-soft);
+}
+
+/* Stats: fewer, larger focal numbers and secondary information below. */
+.view-stats.active {
+  max-width: 1120px;
+}
+.view-stats > .panel {
+  padding: 0;
+}
+.view-stats > .panel > h2 {
+  display: none;
+}
+.view-stats .stats-grid {
+  gap: 12px;
+}
+.view-stats .stats-grid:first-of-type .stat:first-child {
+  min-height: 148px;
+  padding: 22px;
+  border-top: 3px solid var(--pulse);
+  background: var(--surface-raised);
+}
+.view-stats .stats-grid:first-of-type .stat:first-child .val {
+  font-size: 42px;
+}
+
+/* Settings: two related surfaces, matching the reference's main-content /
+   information-panel split without introducing new navigation. */
+.view-settings.active {
+  max-width: 1160px;
+}
+.view-settings .settings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: var(--editorial-gap);
+  align-items: start;
+}
+.settings-grid .panel {
+  min-height: 100%;
+  margin-bottom: 0;
+  padding: 26px 28px;
+}
+.settings-grid .panel:nth-child(2) {
+  background: var(--surface-raised);
+  border-left-width: 4px;
+  border-left-color: var(--pulse);
+}
+
+/* Curved linework inspired by the reference, used once as a quiet framing
+   device rather than decoration on every component. */
+main::before {
+  content: '';
+  position: fixed;
+  right: 5vw;
+  top: 8vh;
+  width: 180px;
+  height: 180px;
+  border: 1px solid color-mix(in srgb, var(--pulse) 16%, transparent);
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.55;
+}
+main::after {
+  content: '';
+  position: fixed;
+  right: 8vw;
+  bottom: 7vh;
+  width: 220px;
+  height: 220px;
+  border: 1px solid color-mix(in srgb, var(--ink-faint) 16%, transparent);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+@media (max-width: 1100px) {
+  .view-dashboard.active {
+    grid-template-columns: 1fr;
+  }
+  .view-dashboard .dashboard-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .view-dashboard .dashboard-summary-card:first-child {
+    grid-row: auto;
+    min-height: 150px;
+  }
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  main {
+    padding: 26px 20px 54px;
+  }
+  .view-title {
+    font-size: clamp(27px, 7vw, 38px);
+  }
+  .view-dashboard .dashboard-overview {
+    grid-template-columns: 1fr;
+  }
+  .view-dashboard .dashboard-summary-card:first-child {
+    min-height: 170px;
+  }
+  main::before,
+  main::after {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  main {
+    padding-inline: 14px;
+  }
+  .view-title-row::after {
+    display: none;
+  }
+  .view-intro {
+    padding-top: 2px;
+  }
+  .view-today .inverse-card,
+  .view-dashboard .dashboard-primary,
+  .view-history > .panel,
+  .settings-grid .panel {
+    padding: 20px 16px;
+  }
+  .view-today .inverse-card {
+    min-height: 0;
+  }
+}
+
+/* ========================================================================
+   V7 : EDITORIAL DESKTOP SHELL
+   Direction: the uploaded reference's split composition, editorial type,
+   thin rules, generous negative space, small technical labels, strong CTA,
+   and restrained contour-line decoration. No new dependencies.
+   ======================================================================== */
+
+:root {
+  --sidebar-width: 264px;
+  --content-max: 1460px;
+  --canvas-pad: clamp(24px, 3.2vw, 56px);
+  --panel-gap: 22px;
+  --nav-surface: #10131a;
+  --nav-ink: #faf6f0;
+  --nav-muted: rgba(250, 246, 240, 0.58);
+  --nav-line: rgba(250, 246, 240, 0.12);
+  --hero-max: 1120px;
+}
+
+[data-theme='light'] {
+  --nav-surface: #1a2332;
+  --nav-ink: #faf6f0;
+  --nav-muted: rgba(250, 246, 240, 0.58);
+  --nav-line: rgba(250, 246, 240, 0.15);
+}
+
+[data-theme='dark'] {
+  --nav-surface: #111219;
+  --nav-ink: #e8e8ec;
+  --nav-muted: rgba(232, 232, 236, 0.55);
+  --nav-line: rgba(232, 232, 236, 0.1);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  background: var(--void);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  z-index: -2;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-width);
+  background: var(--nav-surface);
+}
+
+/* ----------------------------- NAV RAIL ------------------------------ */
+header.topbar {
+  width: var(--sidebar-width);
+  background: var(--nav-surface);
+  border-right: 1px solid var(--nav-line);
+  padding: 30px 20px 22px;
+  gap: 28px;
+}
+
+header.topbar::after {
+  left: 20px;
+  right: 20px;
+  bottom: 17px;
+  background: var(--nav-line);
+  opacity: 1;
+}
+
+header.topbar::before {
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  top: -95px;
+  left: -110px;
+  border: 1px solid var(--nav-line);
+  border-radius: 50%;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+header.topbar .brand {
+  position: relative;
+  z-index: 1;
+  padding: 0 4px 24px;
+  border-bottom: 1px solid var(--nav-line);
+}
+
+header.topbar .brand h1 {
+  color: var(--nav-ink);
+  font-size: 21px;
+  line-height: 0.98;
+  letter-spacing: -0.025em;
+}
+
+header.topbar .brand .sub {
+  color: var(--nav-muted);
+  font-size: 10px;
+  margin-top: 7px;
+}
+
+header.topbar .logo {
+  background: transparent;
+  color: var(--pulse);
+  border-color: var(--pulse);
+  border-radius: var(--radius-sm);
+  width: 40px;
+  height: 40px;
+}
+
+header.topbar .tabs {
+  gap: 6px;
+}
+
+header.topbar .tab {
+  position: relative;
+  min-height: 48px;
+  padding: 10px 12px 10px 14px;
+  color: var(--nav-muted);
+  border-left: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+header.topbar .tab::before {
+  color: var(--nav-muted);
+  font: 10px var(--font-mono);
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+  transform: none;
+}
+
+header.topbar .tab:hover {
+  background: rgba(255, 255, 255, 0.045);
+  color: var(--nav-ink);
+  border-left-color: rgba(255, 255, 255, 0.24);
+  transform: translateX(2px);
+}
+
+header.topbar .tab.active {
+  background: rgba(255, 255, 255, 0.085);
+  border-left-color: var(--pulse);
+  color: var(--nav-ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
+
+header.topbar .tab.active::after {
+  content: '↗';
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  color: var(--pulse);
+  font: 12px var(--font-mono);
+}
+
+header.topbar .tab .shortcut-key {
+  margin-left: auto;
+  color: var(--nav-muted);
+  border-color: var(--nav-line);
+  background: transparent;
+}
+
+header.topbar .tab .badge {
+  margin-left: auto;
+}
+
+.theme-toggle {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 34px;
+  width: calc(100% - 40px);
+  height: 42px;
+  justify-content: center;
+  border-color: var(--nav-line);
+  color: var(--nav-ink);
+  background: transparent;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--pulse);
+}
+
+/* ----------------------------- CANVAS -------------------------------- */
+main {
+  width: min(calc(100% - var(--sidebar-width)), var(--content-max));
+  max-width: var(--content-max);
+  margin: 0 0 0 var(--sidebar-width);
+  padding: 0 var(--canvas-pad) 80px;
+}
+
+.view.active {
+  position: relative;
+  min-height: calc(100vh - 20px);
+  padding-top: 40px;
+  isolation: isolate;
+}
+
+.view.active::before,
+.view.active::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border: 1px solid var(--line-soft);
+  border-radius: 50%;
+}
+
+.view.active::before {
+  width: 330px;
+  height: 330px;
+  right: -170px;
+  top: 70px;
+  opacity: 0.8;
+}
+
+.view.active::after {
+  width: 190px;
+  height: 190px;
+  right: -70px;
+  top: 145px;
+  opacity: 0.5;
+}
+
+/* ----------------------------- EDITORIAL INTRO ----------------------- */
+.view-intro {
+  position: relative;
+  max-width: var(--hero-max);
+  margin: 0 0 28px;
+  padding: 16px 0 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.view-intro::after {
+  content: '↗';
+  position: absolute;
+  right: 7%;
+  top: 22px;
+  color: var(--ink-faint);
+  font: 18px var(--font-mono);
+}
+
+.view-kicker {
+  margin-bottom: 10px;
+  color: var(--pulse);
+  font: 11px/1 var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.view-title {
+  max-width: 16ch;
+  margin: 0;
+  color: var(--ink);
+  font: 700 clamp(42px, 5.7vw, 76px)/0.96 var(--font-serif);
+  letter-spacing: -0.045em;
+}
+
+.view-lede {
+  max-width: 62ch;
+  margin: 18px 0 0;
+  color: var(--ink-dim);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+/* ----------------------------- PANELS -------------------------------- */
+main .panel {
+  margin-bottom: var(--panel-gap);
+  padding: 24px 26px 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+
+.panel:hover {
+  border-color: color-mix(in srgb, var(--ink) 22%, var(--line));
+}
+
+.panel-head,
+.panel-head-row {
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.panel-head h2,
+.panel-head-row h2 {
+  font-size: 17px;
+  letter-spacing: 0.005em;
+  text-transform: none;
+}
+
+/* Only the workspace panel gets a heavy accent edge. Structural panels stay neutral. */
+.view-dashboard .panel-category,
+.view-dashboard #moduleFormPanel {
+  border-left-width: 1px;
+  border-left-color: var(--line);
+}
+
+.view-dashboard #moduleFormPanel {
+  border-left: 4px solid var(--pulse);
+}
+
+.view-dashboard .dashboard-primary {
+  border-left: 4px solid var(--pulse);
+}
+
+/* ----------------------------- HERO / KPI ---------------------------- */
+.dashboard-overview {
+  gap: 0;
+  margin-bottom: var(--panel-gap);
+  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(190px, 0.7fr));
+}
+
+.dashboard-summary-card {
+  min-height: 142px;
+  padding: 18px 20px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.dashboard-summary-card + .dashboard-summary-card {
+  border-left: 1px solid var(--line);
+}
+
+.dashboard-summary-card:hover {
+  background: color-mix(in srgb, var(--surface) 70%, var(--void));
+  border-color: var(--line);
+  transform: none;
+}
+
+.dashboard-summary-card:first-child {
+  padding-left: 0;
+}
+
+.dashboard-summary-label {
+  color: var(--ink-dim);
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
+.dashboard-summary-value {
+  margin-top: 11px;
+  font-size: clamp(34px, 4vw, 52px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.dashboard-summary-sub {
+  margin-top: 12px;
+  max-width: 26ch;
+  font-size: 12px;
+}
+
+/* Empty first-run surface: one strong editorial moment, not three dead boxes. */
+.dashboard-first-run {
+  position: relative;
+  min-height: 350px;
+  margin-bottom: var(--panel-gap);
+  padding: 42px 42px 38px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 30px;
+  background: var(--nav-surface);
+  color: var(--nav-ink);
+  border: 1px solid var(--nav-surface);
+  border-left: 1px solid var(--nav-surface);
+  border-radius: var(--radius-lg);
+}
+
+.dashboard-first-run::before,
+.dashboard-first-run::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(250, 246, 240, 0.12);
+  border-radius: 50%;
+}
+
+.dashboard-first-run::before {
+  width: 420px;
+  height: 420px;
+  right: -170px;
+  top: -160px;
+}
+
+.dashboard-first-run::after {
+  width: 260px;
+  height: 260px;
+  right: -80px;
+  bottom: -130px;
+}
+
+.dashboard-first-run-kicker {
+  position: relative;
+  z-index: 1;
+  color: var(--pulse);
+}
+
+.dashboard-first-run-title {
+  position: relative;
+  z-index: 1;
+  max-width: 12ch;
+  margin-top: 8px;
+  color: var(--nav-ink);
+  font-size: clamp(30px, 4.4vw, 58px);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+}
+
+.dashboard-first-run-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 55ch;
+  color: var(--nav-muted);
+  font-size: 14px;
+}
+
+.dashboard-first-run-flow {
+  position: relative;
+  z-index: 1;
+  margin-top: 20px;
+  color: var(--nav-muted);
+  letter-spacing: 0.1em;
+}
+
+.dashboard-first-run-actions {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+}
+
+/* ----------------------------- BUTTONS -------------------------------- */
+.btn {
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.btn::after {
+  content: '→';
+  display: inline-block;
+  margin-left: 9px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease;
+}
+
+.btn:hover {
+  background: transparent;
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.btn:hover::after {
+  color: var(--pulse);
+  transform: translateX(3px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  border-color: var(--pulse);
+  background: var(--pulse);
+  color: var(--on-pulse);
+}
+
+.btn-primary::after {
+  color: currentColor;
+}
+
+.btn-primary:hover {
+  background: var(--pulse);
+  border-color: var(--pulse);
+  filter: saturate(1.04) brightness(1.03);
+}
+
+.btn-danger {
+  border-color: color-mix(in srgb, var(--critical) 55%, var(--line));
+  color: var(--critical);
+}
+
+.btn-danger::after {
+  content: '×';
+}
+
+.btn-success::after {
+  content: '✓';
+}
+
+.btn-sm {
+  min-height: 34px;
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+/* ----------------------------- INPUTS --------------------------------- */
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  color: var(--ink);
+  box-shadow: none;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--ink-faint);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--pulse);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pulse) 12%, transparent);
+}
+
+.search {
+  min-width: 210px;
+}
+
+/* ----------------------------- BADGES / CHIPS ------------------------- */
+.badge,
+.category-chip,
+.section-count,
+.shortcut-key {
+  border-radius: 999px;
+}
+
+.badge {
+  min-height: 24px;
+  padding: 4px 9px;
+  border: 1px solid currentColor;
+  background: transparent;
+}
+
+.badge-due {
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+}
+
+.badge-done {
+  background: color-mix(in srgb, var(--success) 10%, transparent);
+}
+
+.badge-late {
+  background: color-mix(in srgb, var(--critical) 10%, transparent);
+}
+
+.category-chip {
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.category-chip:hover,
+.category-chip.active {
+  color: var(--ink);
+  border-color: var(--pulse);
+  background: color-mix(in srgb, var(--pulse) 7%, transparent);
+  transform: translateY(-1px);
+}
+
+/* ----------------------------- MODULE CARDS --------------------------- */
+.cards {
+  gap: 12px;
+}
+
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 17px 18px;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.card:hover {
+  border-color: var(--ink-faint);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.card-title {
+  font-size: 17px;
+  letter-spacing: -0.012em;
+}
+
+.node-card:not(.category-card) {
+  border-left-width: 2px;
+}
+
+/* Category cards are containers, not status chips. */
+.category-card {
+  border-top-width: 1px;
+}
+
+/* Keep the tree signature visible without turning every node into a card wall. */
+.steps {
+  margin-top: 15px;
+  padding-top: 4px;
+}
+
+.step-dot::before {
+  background: var(--line-soft);
+}
+
+.step-label {
+  font-size: 10px;
+}
+
+/* ----------------------------- TODAY ---------------------------------- */
+.view-today.active {
+  max-width: 1180px;
+}
+
+.view-today .inverse-card {
+  position: relative;
+  min-height: 430px;
+  padding: 30px 34px 34px;
+  overflow: hidden;
+  background: var(--nav-surface);
+  border-color: var(--nav-surface);
+  color: var(--nav-ink);
+}
+
+.view-today .inverse-card::before {
+  content: '';
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -110px;
+  bottom: -190px;
+  border: 1px solid rgba(250, 246, 240, 0.12);
+  border-radius: 50%;
+}
+
+.view-today .inverse-card > h2 {
+  position: relative;
+  z-index: 1;
+  max-width: 16ch;
+  color: var(--nav-ink);
+  font: 700 clamp(26px, 3.3vw, 44px)/1 var(--font-serif);
+  text-transform: none;
+}
+
+.view-today .inverse-card .muted {
+  color: var(--nav-muted);
+}
+
+.view-today .today-list {
+  position: relative;
+  z-index: 1;
+}
+
+/* ----------------------------- HISTORY -------------------------------- */
+.view-history.active {
+  max-width: 1150px;
+}
+
+.view-history .history-period-head {
+  padding: 12px 0 7px;
+  margin: 22px 0 5px;
+  color: var(--ink-faint);
+  font: 11px var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.view-history .history-row {
+  padding: 14px 16px;
+  border-left-width: 2px;
+  background: transparent;
+}
+
+.view-history .history-row:hover {
+  transform: translateX(3px);
+}
+
+.view-history .history-review {
+  border-left-color: var(--pulse);
+  background: color-mix(in srgb, var(--pulse) 2.5%, transparent);
+}
+
+.view-history .history-mastery {
+  border-left-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 2.5%, transparent);
+}
+
+/* ----------------------------- STATS ---------------------------------- */
+.view-stats.active {
+  max-width: 1250px;
+}
+
+.view-stats > .panel {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.view-stats .stats-grid {
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.view-stats .stat {
+  min-height: 138px;
+  padding: 20px;
+  background: var(--surface);
+  border: 0;
+  border-radius: 0;
+}
+
+.view-stats .stat:hover {
+  background: var(--surface-hover);
+  transform: none;
+}
+
+.view-stats .stat .val {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4vw, 50px);
+}
+
+/* ----------------------------- SETTINGS ------------------------------- */
+.view-settings.active {
+  max-width: 1040px;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+  gap: var(--panel-gap);
+  align-items: start;
+}
+
+.settings-grid .panel {
+  margin-bottom: 0;
+  min-height: 250px;
+}
+
+.settings-panel h2 {
+  font: 700 26px/1 var(--font-serif);
+  letter-spacing: -0.03em;
+  text-transform: none;
+}
+
+/* ----------------------------- FIRST-RUN STATE ------------------------ */
+.view-dashboard.is-first-run {
+  display: block;
+}
+
+.view-dashboard.is-first-run > .panel-category,
+.view-dashboard.is-first-run > #moduleFormPanel,
+.view-dashboard.is-first-run > .dashboard-primary {
+  display: none;
+}
+
+.view-dashboard.is-first-run .dashboard-first-run {
+  display: grid;
+}
+
+/* ----------------------------- RESPONSIVE ----------------------------- */
+@media (max-width: 1100px) {
+  .dashboard-overview {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  body::before {
+    display: none;
+  }
+  header.topbar {
+    position: sticky;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    padding: 12px 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  header.topbar::before,
+  header.topbar::after {
+    display: none;
+  }
+  header.topbar .brand {
+    width: auto;
+    min-width: 0;
+    border-bottom: 0;
+    padding: 0;
+  }
+  header.topbar .brand h1 {
+    font-size: 18px;
+  }
+  header.topbar .brand .sub {
+    display: none;
+  }
+  header.topbar .tabs {
+    flex: 1;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 3px;
+    overflow-x: auto;
+  }
+  header.topbar .tab {
+    width: auto;
+    min-height: 40px;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  .theme-toggle {
+    position: static;
+    width: 40px;
+    flex: 0 0 40px;
+    padding: 0;
+  }
+  main {
+    width: 100%;
+    margin: 0;
+    padding-inline: 20px;
+  }
+  .view.active {
+    padding-top: 25px;
+  }
+  .view-title {
+    font-size: clamp(38px, 8vw, 60px);
+  }
+  .dashboard-overview {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-summary-card,
+  .dashboard-summary-card + .dashboard-summary-card,
+  .dashboard-summary-card:first-child {
+    border-left: 0;
+    padding-left: 18px;
+  }
+  .dashboard-first-run {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .dashboard-first-run-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 620px) {
+  .view.active::before,
+  .view.active::after {
+    display: none;
+  }
+  .view-intro::after {
+    display: none;
+  }
+  .panel {
+    padding: 18px;
+  }
+  .dashboard-first-run {
+    padding: 28px 22px;
+  }
+  .dashboard-first-run-title {
+    font-size: 36px;
+  }
+  .btn-row,
+  .form-row {
+    width: 100%;
+  }
+  .btn,
+  .form-row > .btn {
+    width: auto;
+  }
+  .search {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  header.topbar .tab,
+  .btn,
+  .btn::after,
+  input,
+  select,
+  textarea,
+  .category-chip,
+  .card,
+  .dashboard-summary-card,
+  .view-history .history-row {
+    transition: none !important;
+  }
+}
+
+/* V7 detail pass: recurring controls should feel designed, not browser-default. */
+.collapsible-form summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 44px;
+  padding: 10px 0 11px;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.collapsible-form summary::after {
+  content: '↗';
+  color: var(--pulse);
+  font: 13px var(--font-mono);
+  transition: transform 0.18s ease;
+}
+
+.collapsible-form summary:hover::after {
+  transform: translate(2px, -2px);
+}
+
+.collapsible-form[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.form-row label {
+  color: var(--ink-dim);
+  font: 10px var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  margin-top: 7px;
+}
+
+.tree-toolbar {
+  gap: 8px;
+}
+
+.tree-toolbar .search:first-child {
+  min-width: 250px;
+}
+
+.tree-toolbar .btn {
+  white-space: nowrap;
+}
+
+/* The module workspace reads as a workbench rather than a generic card. */
+.view-dashboard .dashboard-primary {
+  padding-top: 18px;
+}
+
+.view-dashboard .dashboard-primary .panel-head {
+  align-items: flex-end;
+}
+
+.view-dashboard .dashboard-primary .panel-head h2 {
+  font-size: 25px;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.view-dashboard .dashboard-primary .section-count {
+  margin-left: 8px;
+  color: var(--pulse);
+  border-color: color-mix(in srgb, var(--pulse) 50%, var(--line));
+  background: color-mix(in srgb, var(--pulse) 7%, transparent);
+}
+
+/* Empty states use editorial rhythm and a visible next move. */
+.empty,
+.today-empty,
+.history-empty {
+  padding: 34px 20px;
+  min-height: 170px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+}
+
+.empty::before,
+.today-empty::before,
+.history-empty::before {
+  content: '00';
+  display: block;
+  margin-bottom: 12px;
+  color: var(--ink-faint);
+  font: 10px var(--font-mono);
+  letter-spacing: 0.12em;
+}
+
+.today-empty-icon {
+  margin-bottom: 10px;
+  color: var(--pulse);
+}
+
+.today-empty-title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+
+/* Status banner: it becomes a calm signal line, not a floating alert card. */
+.alert-banner {
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+/* Toast follows the same compact utility language as the reference's small product callouts. */
+.toast {
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 12px 14px;
+  background: var(--nav-surface);
+  color: var(--nav-ink);
+  border-color: color-mix(in srgb, var(--nav-ink) 14%, transparent);
+  border-left: 2px solid var(--pulse);
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.toast-action {
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--pulse);
+}
+
+/* Modal: compact, typographic, and clearly above the work surface. */
+.modal-backdrop {
+  background: color-mix(in srgb, var(--void) 82%, transparent);
+}
+
+.modal {
+  width: min(500px, 92vw);
+  padding: 28px;
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+.modal h3 {
+  font: 700 28px/1 var(--font-serif);
+  letter-spacing: -0.03em;
+}
+
+/* Make the global navigation feel like a designed index, not browser tabs. */
+header.topbar .tab[data-view='today'] .badge-due {
+  margin-left: 2px;
+}
+
+.offline-chip {
+  color: var(--nav-muted);
+}
+
+.offline-chip::first-letter {
+  color: var(--pulse);
+}
+
+/* Desktop spacing discipline: enough air to echo the reference without
+   turning the product into an oversized marketing page. */
+@media (min-width: 1400px) {
+  main {
+    padding-inline: clamp(44px, 5vw, 88px);
+  }
+  .view-intro {
+    padding-top: 54px;
+    margin-bottom: 34px;
+  }
+}
+
+/* ========================================================================
+   V8 : FOCUS DESKTOP / EDITORIAL CONTROL SURFACE
+   Direction: uploaded reference image. Light-first canvas, dark structural
+   rail, pale modular surfaces, segmented controls, oversized editorial
+   numbers, restrained rules and tactile actions. Existing behavior preserved.
+   ======================================================================== */
+
+:root {
+  --v8-ink-strong: #1a2332;
+  --v8-paper: #fbf8f3;
+  --v8-paper-2: #f4eee6;
+  --v8-dark: #1a2332;
+  --v8-dark-2: #111822;
+  --v8-white: #faf6f0;
+  --v8-rule: rgba(26, 35, 50, 0.11);
+  --v8-dark-rule: rgba(250, 246, 240, 0.13);
+}
+
+/* App frame: the reference image reads as one instrument, not five floating
+   web pages. The rail is the structural anchor, the canvas is the work area. */
+body {
+  background: var(--void);
+}
+
+header.topbar {
+  background: var(--v8-dark);
+  border-right-color: var(--v8-dark-rule);
+  box-shadow: none;
+}
+
+[data-theme='light'] body {
+  background: var(--void);
+}
+
+[data-theme='light'] main {
+  background: transparent;
+}
+
+/* Brand: compact monogram + editorial wordmark, closer to a designed object. */
+header.topbar .brand {
+  gap: 11px;
+}
+header.topbar .brand h1 {
+  font-size: 22px;
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+header.topbar .logo {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border-width: 1px;
+  font-size: 10px;
+}
+header.topbar .sub {
+  max-width: 170px;
+  line-height: 1.45;
+}
+
+/* Navigation: the screenshot's controls are crisp segmented switches, not
+   generic pill buttons. Active item is a dark block with a tiny accent rail. */
+header.topbar .tabs {
+  gap: 7px;
+}
+header.topbar .tab {
+  min-height: 46px;
+  padding: 10px 11px 10px 13px;
+  border: 1px solid transparent;
+  border-left-width: 2px;
+  border-radius: var(--radius-sm);
+  letter-spacing: -0.01em;
+}
+header.topbar .tab.active {
+  background: rgba(250, 246, 240, 0.09);
+  border-color: rgba(250, 246, 240, 0.06);
+  border-left-color: var(--pulse);
+  box-shadow: none;
+}
+header.topbar .tab:hover {
+  background: rgba(250, 246, 240, 0.065);
+  border-left-color: rgba(250, 246, 240, 0.34);
+}
+header.topbar .tab.active::after {
+  content: '↗';
+  right: 10px;
+  top: 11px;
+}
+.shortcut-key {
+  font-size: 9px;
+  padding: 2px 5px;
+}
+
+/* Light canvas framing: broad breathing room, thin horizontal rules. */
+[data-theme='light'] .view.active {
+  padding-top: 32px;
+}
+[data-theme='light'] .view-intro {
+  max-width: 980px;
+  padding-bottom: 18px;
+  margin-bottom: 20px;
+  border-bottom-color: var(--v8-rule);
+}
+[data-theme='light'] .view-intro::after {
+  color: rgba(26, 35, 50, 0.28);
+}
+[data-theme='light'] .view-kicker {
+  color: var(--pulse-text);
+  letter-spacing: 0.18em;
+}
+[data-theme='light'] .view-title {
+  font-size: clamp(46px, 5vw, 74px);
+  max-width: 13ch;
+  letter-spacing: -0.055em;
+}
+[data-theme='light'] .view-lede {
+  max-width: 60ch;
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+/* Dashboard: three horizontal bands like the reference's metric/control
+   zones. This replaces the sense of "three giant stacked cards". */
+[data-theme='light'] .view-dashboard.active {
+  grid-template-columns: minmax(0, 1.55fr) minmax(250px, 0.75fr);
+  gap: 16px;
+}
+[data-theme='light'] .view-dashboard.active > .view-intro,
+[data-theme='light'] .view-dashboard.active > .alert-banner,
+[data-theme='light'] .view-dashboard.active > .dashboard-first-run,
+[data-theme='light'] .view-dashboard.active > .dashboard-overview,
+[data-theme='light'] .view-dashboard.active > .dashboard-primary {
+  grid-column: 1 / -1;
+}
+
+/* First run: the strongest surface mirrors the reference's large visual
+   panel. It deliberately stays functional, with a direct first action. */
+[data-theme='light'] .dashboard-first-run {
+  min-height: 285px;
+  padding: 34px 36px 32px;
+  background: var(--v8-dark);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+}
+[data-theme='light'] .dashboard-first-run::before {
+  width: 430px;
+  height: 430px;
+  right: -210px;
+  top: -180px;
+  border-color: rgba(250, 246, 240, 0.12);
+}
+[data-theme='light'] .dashboard-first-run::after {
+  width: 270px;
+  height: 270px;
+  right: 60px;
+  bottom: -205px;
+  border-color: rgba(212, 98, 42, 0.28);
+}
+[data-theme='light'] .dashboard-first-run-title {
+  font-size: clamp(38px, 4.8vw, 64px);
+  max-width: 12ch;
+}
+[data-theme='light'] .dashboard-first-run-copy {
+  max-width: 52ch;
+  color: rgba(250, 246, 240, 0.62);
+}
+[data-theme='light'] .dashboard-first-run-flow {
+  color: rgba(250, 246, 240, 0.44);
+}
+
+/* Dashboard metrics: clean instrumentation instead of floating SaaS cards. */
+[data-theme='light'] .dashboard-overview {
+  margin-bottom: 0;
+  padding: 0;
+  background: var(--v8-paper);
+  border: 1px solid var(--v8-rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  gap: 0;
+}
+[data-theme='light'] .dashboard-summary-card,
+[data-theme='light'] .dashboard-summary-card:first-child {
+  min-height: 126px;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+}
+[data-theme='light'] .dashboard-summary-card + .dashboard-summary-card {
+  border-left: 1px solid var(--v8-rule);
+}
+[data-theme='light'] .dashboard-summary-card:first-child {
+  background: var(--v8-paper-2);
+}
+[data-theme='light'] .dashboard-summary-value,
+[data-theme='light'] .dashboard-summary-card:first-child .dashboard-summary-value {
+  font-size: clamp(38px, 4.4vw, 58px);
+  line-height: 0.9;
+  color: var(--v8-ink-strong);
+}
+[data-theme='light'] .dashboard-summary-label {
+  color: var(--ink-dim);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+
+/* Setup band: category and create-module become adjacent compact controls. */
+[data-theme='light'] .view-dashboard > .panel-category,
+[data-theme='light'] .view-dashboard > #moduleFormPanel {
+  min-width: 0;
+  background: var(--v8-paper);
+  border: 1px solid var(--v8-rule);
+  border-left: 1px solid var(--v8-rule);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+}
+[data-theme='light'] .view-dashboard > .panel-category {
+  margin-bottom: 0;
+}
+[data-theme='light'] .view-dashboard > #moduleFormPanel {
+  border-top: 3px solid var(--pulse);
+}
+[data-theme='light'] .view-dashboard > .panel-category .panel-head-row,
+[data-theme='light'] .view-dashboard > #moduleFormPanel summary {
+  border-bottom: 0;
+}
+
+/* Main module workspace: a quiet control room, like the reference's climate
+   analytics block. Search/actions form a segmented control strip. */
+[data-theme='light'] .dashboard-primary {
+  background: var(--v8-paper);
+  border: 1px solid var(--v8-rule);
+  border-left: 4px solid var(--pulse);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px 24px;
+}
+[data-theme='light'] .dashboard-primary .panel-head {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--v8-rule);
+}
+[data-theme='light'] .dashboard-primary .panel-head h2 {
+  font-size: 18px;
+}
+
+/* Buttons: hard-edged instrument controls. Primary is dark/terracotta; basic
+   actions become outlined; destructive remains semantic red. */
+[data-theme='light'] .btn {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid rgba(26, 35, 50, 0.22);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  box-shadow: none;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+[data-theme='light'] .btn::after {
+  color: rgba(26, 35, 50, 0.42);
+}
+[data-theme='light'] .btn:hover {
+  background: var(--v8-dark);
+  border-color: var(--v8-dark);
+  color: var(--v8-white);
+}
+[data-theme='light'] .btn:hover::after {
+  color: var(--pulse);
+}
+[data-theme='light'] .btn-primary {
+  background: var(--pulse);
+  border-color: var(--pulse);
+  color: var(--on-pulse);
+  font-weight: 800;
+}
+[data-theme='light'] .btn-primary:hover {
+  background: var(--v8-dark);
+  border-color: var(--v8-dark);
+  color: var(--v8-white);
+}
+[data-theme='light'] .btn-danger:hover {
+  background: var(--critical);
+  border-color: var(--critical);
+  color: var(--v8-white);
+}
+
+/* Search/select strip: closer to the reference's segmented controls. */
+[data-theme='light'] input,
+[data-theme='light'] select,
+[data-theme='light'] textarea {
+  background: var(--v8-paper-2);
+  border-color: var(--v8-rule);
+  border-radius: var(--radius-sm);
+}
+[data-theme='light'] input:hover,
+[data-theme='light'] select:hover,
+[data-theme='light'] textarea:hover {
+  border-color: rgba(26, 35, 50, 0.28);
+}
+[data-theme='light'] .search {
+  min-width: 190px;
+}
+[data-theme='light'] .tree-toolbar .btn {
+  min-width: 92px;
+}
+
+/* Cards: dense information tiles, not giant rounded widgets. */
+[data-theme='light'] .card {
+  background: var(--v8-paper-2);
+  border-color: var(--v8-rule);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+[data-theme='light'] .card:hover {
+  background: var(--v8-paper);
+  border-color: rgba(26, 35, 50, 0.22);
+  transform: translateY(-1px);
+}
+[data-theme='light'] .card-title {
+  font-size: 16px;
+}
+
+/* Module category accents are now small markers, like the colored status
+   dots in the supplied reference, instead of saturated card borders. */
+[data-theme='light'] .node-card.category-card,
+[data-theme='light'] .node-card:not(.category-card) {
+  border-left-color: var(--line);
+}
+[data-theme='light'] .category-chip.active {
+  background: var(--v8-dark);
+  color: var(--v8-white);
+  border-color: var(--v8-dark);
+}
+
+/* Today: large control surface with compact review tiles below. */
+[data-theme='light'] .view-today .inverse-card {
+  min-height: 480px;
+  padding: 34px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--v8-dark);
+}
+[data-theme='light'] .view-today .inverse-card > h2 {
+  font-size: clamp(31px, 4vw, 50px);
+  margin-bottom: 24px;
+}
+[data-theme='light'] .view-today .today-list .card {
+  background: rgba(250, 246, 240, 0.055);
+  border-color: rgba(250, 246, 240, 0.12);
+  color: var(--nav-ink);
+}
+[data-theme='light'] .view-today .today-list .card:hover {
+  background: rgba(250, 246, 240, 0.09);
+  border-color: rgba(250, 246, 240, 0.24);
+}
+
+/* History: thin journal rows and stronger date anchors. */
+[data-theme='light'] .view-history > .panel,
+[data-theme='light'] .view-stats > .panel,
+[data-theme='light'] .settings-grid .panel {
+  background: var(--v8-paper);
+  border-color: var(--v8-rule);
+}
+[data-theme='light'] .view-history .history-row {
+  background: transparent;
+  border-left-color: transparent;
+  border-bottom: 1px solid var(--v8-rule);
+  border-radius: 0;
+}
+[data-theme='light'] .view-history .history-review {
+  border-left: 2px solid var(--pulse);
+}
+[data-theme='light'] .view-history .history-mastery {
+  border-left: 2px solid var(--warn);
+}
+[data-theme='light'] .view-history .history-row:hover {
+  background: var(--v8-paper-2);
+  transform: translateX(2px);
+}
+
+/* Stats: large numerals, minimal chrome. */
+[data-theme='light'] .view-stats .stat {
+  background: transparent;
+  border-color: var(--v8-rule);
+  border-radius: 0;
+}
+[data-theme='light'] .view-stats .stats-grid:first-of-type .stat:first-child {
+  background: var(--v8-dark);
+  color: var(--v8-white);
+  border-color: var(--v8-dark);
+}
+[data-theme='light'] .view-stats .stats-grid:first-of-type .stat:first-child .val,
+[data-theme='light'] .view-stats .stats-grid:first-of-type .stat:first-child .muted {
+  color: var(--v8-white);
+}
+
+/* Settings: segmented actions with one clear destructive control. */
+[data-theme='light'] .settings-grid .panel:nth-child(2) {
+  background: var(--v8-paper-2);
+  border-left: 3px solid var(--pulse);
+}
+
+/* Theme control remains visually integrated in the dark rail. */
+header.topbar .theme-toggle {
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.06em;
+}
+header.topbar .theme-toggle::after {
+  content: none;
+}
+
+/* The reference uses subtle curved guide lines. Keep them extremely faint so
+   they never compete with content. */
+[data-theme='light'] main::before {
+  right: 7vw;
+  top: 11vh;
+  width: 250px;
+  height: 250px;
+  border-color: rgba(26, 35, 50, 0.08);
+  opacity: 0.75;
+}
+[data-theme='light'] main::after {
+  right: 4vw;
+  bottom: 4vh;
+  width: 300px;
+  height: 300px;
+  border-color: rgba(212, 98, 42, 0.08);
+  opacity: 0.6;
+}
+
+/* Responsive fallback: retain a coherent single-column workstation on small
+   screens instead of forcing the desktop instrument into a cramped grid. */
+@media (max-width: 900px) {
+  [data-theme='light'] .view-dashboard.active {
+    grid-template-columns: 1fr;
+  }
+  [data-theme='light'] .view-dashboard.active > .panel-category,
+  [data-theme='light'] .view-dashboard.active > #moduleFormPanel {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='light'] .btn:hover,
+  [data-theme='light'] .card:hover,
+  [data-theme='light'] .view-history .history-row:hover {
+    transform: none;
+  }
+}

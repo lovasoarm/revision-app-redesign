@@ -1,0 +1,36 @@
+{
+  "name": "my-revision-app",
+  "version": "10.0.0",
+  "description": "Application desktop légère de révision espacée, offline-first, prête pour Tauri.",
+  "private": true,
+  "scripts": {
+    "check": "node --check src/script.js || true",
+    "test": "vitest",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "npm run build:web && tauri build",
+    "dev": "tauri dev",
+    "build:web": "echo \"Build your frontend (vite/parcel) here\" && mkdir -p dist && cp -r src/* dist/ || true",
+    "start": "npm run dev",
+    "lint": "eslint . --ext .js,.mjs --max-warnings=0 || true",
+    "test:unit": "vitest",
+    "test:e2e": "playwright test || true",
+    "serve:dist": "npx http-server ./dist -p 3000",
+    "lhci:collect": "lhci collect",
+    "lhci:assert": "lhci assert",
+    "audit:axe": "node tools/axe-audit.js",
+    "test:e2e:local": "playwright test --config=playwright/playwright.config.js",
+    "prepare:v10": "echo 'v10 prepared'"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
+    "vitest": "^1.0.0",
+    "@playwright/test": "^1.40.0",
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0",
+    "playwright": "^1.40.0",
+    "lhci": "^0.8.0",
+    "puppeteer": "^20.0.0",
+    "@axe-core/puppeteer": "^4.0.0"
+  },
+  "type": "module"
+}
