@@ -85,7 +85,7 @@
           <div class="panel-head-row">
             <h2>Catégories</h2>
           </div>
-          <div id="categoryChips" class="category-chips"></div>
+          <div id="categoryChips" class="category-grid" aria-label="Vos univers d'apprentissage"></div>
           <details class="collapsible-form">
             <summary>+ Nouvelle catégorie</summary>
             <p class="muted small">
@@ -117,11 +117,13 @@
                 maxlength="80"
                 placeholder="Ex : 07_hash_table"
             /></label>
-            <label
-              >Catégorie / module parent<select id="mParent" required>
+            <label>
+              Catégorie / module parent
+              <input type="search" id="mParentSearch" class="search parent-search" placeholder="Filtrer les parents…" autocomplete="off" />
+              <select id="mParent" required>
                 <option value="" disabled selected>: Choisir une catégorie ou un module</option>
-              </select></label
-            >
+              </select>
+            </label>
             <label>Date de début<input type="date" id="mStart" required /></label>
             <label
               >Durée estimée (min)<input type="number" id="mDuration" min="1" max="1000" value="60"
@@ -154,26 +156,40 @@
             module.
           </p>
         </details>
-        <div class="panel dashboard-primary">
-          <div class="panel-head">
-            <div class="section-title-group">
-              <h2>Modules</h2>
-              <span class="section-count" id="moduleCount">0</span>
-            </div>
-            <div class="btn-row tree-toolbar">
-              <input type="search" id="search" class="search" placeholder="Rechercher…" />
-              <select id="statusFilter" class="search">
-                <option value="">Tous les statuts</option>
-                <option value="learned">Compris</option>
-                <option value="review">À revoir</option>
-                <option value="unset">Non évalué</option>
-              </select>
-              <button class="btn btn-sm" id="expandAllBtn" type="button">Tout déplier</button>
-              <button class="btn btn-sm" id="collapseAllBtn" type="button">Tout replier</button>
+        <div id="categoryWorkspace" class="category-workspace" hidden>
+          <div class="view-intro category-workspace-intro">
+            <div class="view-kicker" id="categoryWorkspaceKicker"></div>
+            <div class="view-title-row">
+              <div>
+                <h2 class="view-title" id="categoryWorkspaceTitle">Ce qui compose cet univers.</h2>
+                <p class="view-lede" id="categoryWorkspaceLede"></p>
+              </div>
+              <div class="btn-row category-workspace-actions">
+                <button class="btn btn-sm" id="categoryBackBtn" type="button">← Toutes les catégories</button>
+                <button class="btn btn-primary btn-sm" id="categoryAddModuleBtn" type="button">+ Nouveau module</button>
+              </div>
             </div>
           </div>
-          <div id="moduleList" class="cards tree-list"></div>
-        </div>
+          <div class="panel dashboard-primary">
+            <div class="panel-head">
+              <div class="section-title-group">
+                <h2>Modules</h2>
+                <span class="section-count" id="moduleCount">0</span>
+              </div>
+              <div class="btn-row tree-toolbar">
+                <input type="search" id="search" class="search" placeholder="Rechercher dans cette catégorie…" />
+                <select id="statusFilter" class="search">
+                  <option value="">Tous les statuts</option>
+                  <option value="learned">Compris</option>
+                  <option value="review">À revoir</option>
+                  <option value="unset">Non évalué</option>
+                </select>
+                <button class="btn btn-sm" id="expandAllBtn" type="button">Tout déplier</button>
+                <button class="btn btn-sm" id="collapseAllBtn" type="button">Tout replier</button>
+              </div>
+            </div>
+            <div id="moduleList" class="cards tree-list"></div>
+          </div>
       </section>
 
       <!-- TODAY -->
@@ -208,9 +224,7 @@
           <div class="panel-head">
             <h2>Historique</h2>
             <div class="btn-row">
-              <select id="historyFilter" class="search">
-                <option value="">Tous les modules</option>
-              </select>
+              <input id="historyFilter" class="search" type="search" placeholder="Rechercher dans l'historique…" aria-label="Rechercher dans l'historique" />
               <select id="historyTypeFilter" class="search">
                 <option value="">Révisions + maîtrise</option>
                 <option value="reviews">Révisions uniquement</option>
@@ -342,20 +356,25 @@
     <!-- Onboarding Modal -->
     <div
       id="onboarding"
-      class="modal hidden"
+      class="modal-backdrop"
+      hidden
+      aria-hidden="true"
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-title"
       aria-describedby="onboarding-desc"
     >
-      <h2 id="onboarding-title">Bienvenue : Quelques points rapides</h2>
-      <p id="onboarding-desc">
-        Cette application fonctionne hors‑ligne, vos données sont stockées localement. Utilisez le
-        menu pour exporter/importer des sauvegardes.
-      </p>
-      <div style="display: flex; gap: 8px; margin-top: 12px">
-        <button id="onboarding-done">J'ai compris</button>
-        <button id="onboarding-dontshow">Ne plus afficher</button>
+      <div class="modal onboarding-modal">
+        <h2 id="onboarding-title">Bienvenue dans Révision Espacée</h2>
+        <p id="onboarding-desc" class="muted">
+          L'application fonctionne hors-ligne et garde vos données sur cet appareil. Utilisez les
+          onglets Dashboard, Aujourd'hui, Historique, Statistiques et Réglages pour naviguer.
+          Les sauvegardes export/import se trouvent dans l'onglet Réglages.
+        </p>
+        <div class="btn-row end onboarding-actions">
+          <button id="onboarding-dontshow" class="btn" type="button">Ne plus afficher</button>
+          <button id="onboarding-done" class="btn btn-primary" type="button">J'ai compris</button>
+        </div>
       </div>
     </div>
   </body>

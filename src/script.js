@@ -1,28 +1,27 @@
-
-// Onboarding show-once logic (v10)
-(function(){
+// Onboarding show-once logic : utilise le même backdrop/modal que le reste de l'app.
+(function () {
   try {
-    const shown = localStorage.getItem('onboarding:v10');
-    const modal = document.getElementById('onboarding');
-    if (!shown && modal) {
-      // open modal using modal helpers if present
-      if (window.openModal) openModal(modal);
-      else modal.classList.remove('hidden');
+    var key = "onboarding:v11";
+    var modal = document.getElementById("onboarding");
+    var done = document.getElementById("onboarding-done");
+    var dont = document.getElementById("onboarding-dontshow");
+    if (!modal) return;
+    function closeOnboarding(hideForever) {
+      modal.hidden = true;
+      modal.setAttribute("aria-hidden", "true");
+      if (hideForever) localStorage.setItem(key, "1");
     }
-    const done = document.getElementById('onboarding-done');
-    const dont = document.getElementById('onboarding-dontshow');
-    function closeOnboarding(hideForever=false){
-      if (modal) {
-        if (window.closeModal) closeModal(modal);
-        else modal.classList.add('hidden');
-      }
-      if (hideForever) localStorage.setItem('onboarding:v10','1');
+    function openOnboarding() {
+      modal.hidden = false;
+      modal.setAttribute("aria-hidden", "false");
+      if (done) done.focus();
     }
-    if (done) done.addEventListener('click', ()=> closeOnboarding(true));
-    if (dont) dont.addEventListener('click', ()=> closeOnboarding(true));
-  } catch(e){ console.warn('onboarding failed', e) }
+    if (!localStorage.getItem(key)) openOnboarding();
+    if (done) done.addEventListener("click", function () { closeOnboarding(false); });
+    if (dont) dont.addEventListener("click", function () { closeOnboarding(true); });
+    modal.addEventListener("click", function (event) { if (event.target === modal) closeOnboarding(false); });
+  } catch (e) { console.warn("onboarding failed", e); }
 })();
-
 
 import { createStorage } from "./core/storage.js";
 import { validateImportPayload } from "./core/validation.js";
@@ -678,6 +677,7 @@ import { createConfirmModal } from "./ui/modal.js";
   var expandedNodes = new Set(); // ids des nœuds dépliés dans l'arbre (affiche les ENFANTS)
   var detailExpanded = new Set(); // ids des modules dont le DÉTAIL de la carte est déplié (description, jauge complète, timeline) : indépendant du dépliage de l'arbre
   var selectedParentId = null; // parent choisi pour le prochain ajout
+  var currentCategoryId = null; // catégorie ouverte dans le Dashboard
   var treeQuery = "";
   var treeFilterStatus = ""; // "", "learned", "review", "unset"
   var editingField = { node: null, field: null }; // édition inline description/à-retenir en cours
@@ -696,6 +696,7 @@ import { createConfirmModal } from "./ui/modal.js";
     renderDashboardFirstRun();
     renderCategoryChips();
     renderParentSelect();
+    renderCategoryWorkspace();
     renderTree();
     renderToday();
     renderHistory();
@@ -782,134 +783,72 @@ import { createConfirmModal } from "./ui/modal.js";
     box.appendChild(goBtn);
   }
 
-  // ---- chips de catégories existantes, au-dessus du formulaire de
-  // création : simple rappel visuel de ce qui existe déjà (évite les
-  function renderDashboardOverview() {
-    var box = $("dashboardOverview");
-    if (!box) return;
-    box.textContent = "";
-    var leaves = allLeaves();
-    if (!leaves.length) {
-      box.hidden = true;
-      return;
-    }
-    box.hidden = false;
-
-    var today = todayISO();
-    var due = pendingDue(today);
-    var late = due.filter(function (item) { return item.review.due < today; });
-    var mastery = leaves.length
-      ? Math.round(leaves.reduce(function (sum, node) { return sum + (node.mastery || 0); }, 0) / leaves.length)
-      : 0;
-
-    var next = null;
-    state.nodes.forEach(function (node) {
-      if (node.isCategory) return;
-      (node.reviews || []).forEach(function (review) {
-        if (review.doneAt || review.due <= today) return;
-        if (!next || review.due < next.due) next = review;
-      });
-    });
-
-    function summary(value, label, sub, cls) {
-      var card = el("div", "dashboard-summary-card" + (cls ? " " + cls : ""));
-      card.appendChild(el("div", "dashboard-summary-label", label));
-      card.appendChild(el("span", "dashboard-summary-value", value));
-      if (sub) card.appendChild(el("div", "dashboard-summary-sub", sub));
-      return card;
-    }
-
-    box.appendChild(
-      summary(
-        String(due.length),
-        "À faire aujourd'hui",
-        late.length ? late.length + " en retard" : "Aucun retard aujourd'hui",
-        late.length ? "is-alert" : "is-primary",
-      ),
-    );
-    box.appendChild(
-      summary(
-        mastery + " %",
-        "Maîtrise moyenne",
-        leaves.length + " leçon(s) suivie(s)",
-      ),
-    );
-    box.appendChild(
-      summary(
-        next ? fmt(next.due) : "Aucune",
-        "Prochaine échéance",
-        next ? "prochaine révision planifiée" : "aucune échéance future",
-      ),
-    );
-  }
-
-  function renderDashboardFirstRun() {
-    var box = $("dashboardFirstRun");
-    var view = $("view-dashboard");
-    if (!box || !view) return;
-    var hasCategory = state.nodes.some(function (node) { return node.isCategory; });
-    var hasModule = state.nodes.some(function (node) { return !node.isCategory; });
-    var firstRun = !hasCategory && !hasModule;
-    view.classList.toggle("is-first-run", firstRun);
-    box.hidden = !firstRun;
-    if (!firstRun) {
-      box.textContent = "";
-      return;
-    }
-    box.textContent = "";
-    var copy = el("div");
-    copy.appendChild(el("div", "dashboard-first-run-kicker", "Première utilisation"));
-    copy.appendChild(el("div", "dashboard-first-run-title", "Commencez par créer votre première catégorie"));
-    copy.appendChild(el("p", "dashboard-first-run-copy", "Une catégorie sert de point de départ à votre arbre d'apprentissage. Après elle, vous pourrez ajouter vos modules, puis les réviser selon le cycle J+1 / J+7 / J+21 / J+60."));
-    copy.appendChild(el("div", "dashboard-first-run-flow", "CATÉGORIE  →  MODULE  →  RÉVISION  →  MAÎTRISE"));
-    var actions = el("div", "dashboard-first-run-actions");
-    var btn = el("button", "btn btn-primary", "Créer ma première catégorie");
-    btn.type = "button";
-    btn.addEventListener("click", function () {
-      var panel = $("view-dashboard").querySelector(".panel-category .collapsible-form");
-      if (panel) panel.open = true;
-      $("view-dashboard").querySelector(".panel-category").scrollIntoView({ behavior: "smooth", block: "start" });
-      var input = $("cName");
-      if (input) window.setTimeout(function () { input.focus(); }, 180);
-    });
-    actions.appendChild(btn);
-    box.appendChild(copy);
-    box.appendChild(actions);
-  }
-
-  // doublons), avec la maîtrise agrégée de chaque univers.
+  // ---- grille de catégories : le Dashboard reste volontairement compact.
   function renderCategoryChips() {
     var box = $("categoryChips");
     box.textContent = "";
-    var cats = state.nodes.filter(function (n) {
-      return n.isCategory;
-    });
+    var cats = rootNodes().filter(function (n) { return n.isCategory; });
     var panel = box.closest(".panel-category");
     if (panel) panel.classList.toggle("has-categories", cats.length > 0);
-    if (!cats.length) {
-      box.appendChild(
-        el(
-          "span",
-          "category-chip-empty",
-          "Aucune catégorie pour l'instant : créez-en une pour commencer.",
-        ),
-      );
-      return;
+    if (!cats.length) { box.appendChild(el("span", "category-chip-empty", "Aucune catégorie pour l'instant : créez-en une pour commencer.")); return; }
+    var today = todayISO();
+    cats.slice().sort(function (a,b) { return a.name.localeCompare(b.name); }).forEach(function (c) {
+      var card = el("button", "category-overview-card", ""); card.type = "button";
+      var accentIdx = typeof c.accentIndex === "number" ? c.accentIndex % 8 : 0;
+      card.appendChild(el("span", "category-overview-accent accent-" + accentIdx));
+      var top = el("div", "category-overview-top"); top.appendChild(el("span", "category-overview-name", c.name)); top.appendChild(masteryPill(aggregatedMastery(c))); card.appendChild(top);
+      var meta = el("div", "category-overview-meta"); meta.appendChild(el("span", "category-overview-stat", leafCountOf(c) + " leçon(s)"));
+      var dueCount = pendingDue(today).filter(function (item) { return belongsToCategory(item.node.id,c.id); }).length;
+      meta.appendChild(el("span", "category-overview-due", dueCount ? dueCount + " due(s)" : "À jour")); card.appendChild(meta);
+      card.appendChild(el("div", "category-overview-foot", "Ouvrir l'univers →"));
+      card.addEventListener("click", function () { openCategory(c.id); }); box.appendChild(card);
+    });
+  }
+  function belongsToCategory(nodeId, categoryId) { var n=nodeIndex.get(nodeId); while(n){ if(n.id===categoryId) return true; n=n.parentId?nodeIndex.get(n.parentId):null; } return false; }
+  function openCategory(categoryId) {
+    var category=nodeIndex.get(categoryId); if(!category || !category.isCategory) return;
+    currentCategoryId=categoryId; selectedParentId=categoryId; treeQuery=""; treeFilterStatus=""; treeRenderLimit=260;
+    if($("search")) $("search").value=""; if($("statusFilter")) $("statusFilter").value="";
+    renderParentSelect(); renderCategoryWorkspace(); renderTree();
+    var panel=$("moduleFormPanel"); if(panel){ panel.removeAttribute("open"); panel.dataset.categoryOpen=""; }
+    var back=$("categoryBackBtn"); if(back) back.focus();
+  }
+  function closeCategory() {
+    currentCategoryId=null; selectedParentId=null; treeQuery=""; treeFilterStatus=""; treeRenderLimit=260;
+    if($("search")) $("search").value=""; if($("statusFilter")) $("statusFilter").value="";
+    renderParentSelect(); renderCategoryWorkspace(); renderTree();
+  }
+  function renderCategoryWorkspace() {
+    var workspace=$("categoryWorkspace");
+    var category=currentCategoryId?nodeIndex.get(currentCategoryId):null;
+    var categoryPanel=document.querySelector(".view-dashboard .panel-category");
+    var overview=$("dashboardOverview");
+    var firstRun=$("dashboardFirstRun");
+    var moduleForm=$("moduleFormPanel");
+    if(!workspace) return;
+    workspace.hidden=!category;
+    if(categoryPanel) categoryPanel.hidden=!!category;
+    if(overview) overview.hidden=!!category || !overview.childElementCount;
+    if(firstRun && category) firstRun.hidden=true;
+    if(moduleForm) {
+      moduleForm.hidden=!!category && !moduleForm.dataset.categoryOpen;
+      if(!category) delete moduleForm.dataset.categoryOpen;
     }
-    cats
-      .slice()
-      .sort(function (a, b) {
-        return a.name.localeCompare(b.name);
-      })
-      .forEach(function (c) {
-        var chip = el("span", "category-chip");
-        var accentIdx =
-          typeof c.accentIndex === "number" ? c.accentIndex % 8 : 0;
-        chip.appendChild(el("span", "accent-dot accent-" + accentIdx));
-        chip.appendChild(document.createTextNode(c.name));
-        chip.appendChild(masteryPill(aggregatedMastery(c)));
-        box.appendChild(chip);
-      });
+    if(!category) return;
+    var leaves=leafCountOf(category); var count=descendantsOf(category.id).length; var mastery=aggregatedMastery(category);
+    $("categoryWorkspaceKicker").textContent=category.name.toUpperCase();
+    $("categoryWorkspaceTitle").textContent="Ce qui compose cet univers.";
+    $("categoryWorkspaceLede").textContent=leaves+" leçon(s), "+count+" élément(s) dans le sous-arbre, maîtrise agrégée à "+mastery+" %.";
+  }
+
+  function openModuleForm(parentId) {
+    if(parentId) selectedParentId=parentId;
+    var panel=$("moduleFormPanel"); if(!panel) return;
+    panel.hidden=false;
+    panel.dataset.categoryOpen=currentCategoryId ? "1" : "";
+    renderParentSelect();
+    panel.open=true;
+    panel.scrollIntoView({behavior:"smooth",block:"start"});
   }
 
   // ---- sélecteur de parent (formulaire d'ajout de module) : liste
@@ -918,7 +857,9 @@ import { createConfirmModal } from "./ui/modal.js";
   // vers une catégorie ou un module déjà rattaché à une catégorie.
   function renderParentSelect() {
     var sel = $("mParent");
+    var search = $("mParentSearch");
     var keep = selectedParentId;
+    var searchValue = search ? search.value : "";
     sel.textContent = "";
 
     var cats = rootNodes().filter(function (n) {
@@ -945,6 +886,16 @@ import { createConfirmModal } from "./ui/modal.js";
     walk(cats, "");
     sel.value = keep && nodeIndex.has(keep) ? keep : "";
     selectedParentId = sel.value || null;
+    filterParentOptions(searchValue);
+  }
+
+  function filterParentOptions(query) {
+    var sel=$("mParent"); if(!sel) return;
+    var q=String(query||"").trim().toLowerCase();
+    Array.prototype.forEach.call(sel.options,function(option,index){
+      if(index===0){ option.hidden=false; return; }
+      option.hidden=!!q && option.textContent.toLowerCase().indexOf(q)===-1 && option.value!==selectedParentId;
+    });
   }
 
   function matchesFilter(n) {
@@ -959,15 +910,13 @@ import { createConfirmModal } from "./ui/modal.js";
     var box = $("moduleList");
     box.textContent = "";
     if (treeQuery !== searchIndexQuery) buildSearchIndex();
-    var allVisible = state.nodes.filter(matchesFilter);
-    var roots = rootNodes().filter(matchesFilter);
+    var scopeNodes = currentCategoryId ? descendantsOf(currentCategoryId) : [];
+    var allVisible = scopeNodes.filter(matchesFilter);
+    var roots = currentCategoryId ? childrenOf(currentCategoryId).filter(matchesFilter) : [];
     var totalVisible = allVisible.length;
     $("moduleCount").textContent = String(totalVisible);
-    box.classList.toggle("tree-volume-high", state.nodes.length >= 120);
-    box.classList.toggle(
-      "tree-volume-medium",
-      state.nodes.length >= 60 && state.nodes.length < 120,
-    );
+    box.classList.toggle("tree-volume-high", scopeNodes.length >= 120);
+    box.classList.toggle("tree-volume-medium", scopeNodes.length >= 60 && scopeNodes.length < 120);
 
     if (treeRenderObserver) {
       treeRenderObserver.disconnect();
@@ -975,7 +924,7 @@ import { createConfirmModal } from "./ui/modal.js";
     }
     if (!roots.length) {
       var emptyBox = el("div", "empty module-empty");
-      var hasAnyModule = state.nodes.some(function (n) { return !n.isCategory; });
+      var hasAnyModule = currentCategoryId ? scopeNodes.some(function(n){ return !n.isCategory; }) : state.nodes.some(function(n){ return !n.isCategory; });
       emptyBox.appendChild(
         el(
           "div",
@@ -997,7 +946,7 @@ import { createConfirmModal } from "./ui/modal.js";
       var emptyAction = el("button", "btn btn-sm", state.nodes.length && hasAnyModule ? "Réinitialiser les filtres" : "Ouvrir le formulaire");
       emptyAction.type = "button";
       emptyAction.addEventListener("click", function () {
-        if (state.nodes.length && hasAnyModule) {
+        if (hasAnyModule) {
           treeQuery = "";
           treeFilterStatus = "";
           $("search").value = "";
@@ -1005,9 +954,7 @@ import { createConfirmModal } from "./ui/modal.js";
           renderTree();
           return;
         }
-        var panel = $("moduleFormPanel");
-        if (panel) panel.open = true;
-        panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        openModuleForm(currentCategoryId || selectedParentId);
         var parent = $("mParent");
         if (parent && !parent.disabled) parent.focus();
       });
@@ -1044,7 +991,7 @@ import { createConfirmModal } from "./ui/modal.js";
       var more = el("button", "btn btn-sm", "Charger la suite");
       more.type = "button";
       more.addEventListener("click", function () {
-        treeRenderLimit += state.nodes.length >= 1000 ? 180 : 260;
+        treeRenderLimit += scopeNodes.length >= 1000 ? 180 : 260;
         renderTree();
       });
       sentinel.appendChild(more);
@@ -1374,12 +1321,10 @@ import { createConfirmModal } from "./ui/modal.js";
       addSub.addEventListener("click", function () {
         selectedParentId = n.id;
         renderParentSelect();
-        $("moduleFormPanel").open = true;
+        openModuleForm(n.id);
         $("mName").focus();
-        $("view-dashboard").scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        if (!currentCategoryId) $("view-dashboard").scrollIntoView({ behavior: "smooth", block: "start" });
+        else { var workspace=$("categoryWorkspace"); if(workspace) workspace.scrollIntoView({ behavior: "smooth", block: "start" }); }
         toast("Parent réglé sur « " + n.name + " »");
       });
       actions.appendChild(addSub);
@@ -1686,19 +1631,8 @@ import { createConfirmModal } from "./ui/modal.js";
   }
 
   function renderHistory() {
-    var sel = $("historyFilter");
-    var keep = sel.value;
-    sel.textContent = "";
-    sel.appendChild(new Option("Tous les modules", ""));
-    state.nodes
-      .slice()
-      .sort(function (a, b) {
-        return pathOf(a.id).join("/").localeCompare(pathOf(b.id).join("/"));
-      })
-      .forEach(function (n) {
-        sel.appendChild(new Option(pathOf(n.id).join(" / "), n.id));
-      });
-    sel.value = keep;
+    var queryInput = $("historyFilter");
+    var query = queryInput ? queryInput.value.trim().toLowerCase() : "";
 
     var typeSel = $("historyTypeFilter");
     var keepType = typeSel.value;
@@ -1706,9 +1640,10 @@ import { createConfirmModal } from "./ui/modal.js";
     var box = $("historyList");
     box.textContent = "";
     var rows = state.history.slice();
-    if (keep)
+    if (query)
       rows = rows.filter(function (h) {
-        return h.nodeId === keep;
+        var haystack = String(h.path || h.nodeName || "").toLowerCase();
+        return haystack.indexOf(query) !== -1;
       });
     if (keepType === "reviews")
       rows = rows.filter(function (h) {
@@ -2228,25 +2163,16 @@ import { createConfirmModal } from "./ui/modal.js";
 
   async function deleteNode(n) {
     if (pendingDeletion) await commitPendingDeletion();
-
     var kids = descendantsOf(n.id);
+    var largeCategoryDelete = n.isCategory && kids.length > 10;
     var okc = await confirmModal({
-      title: n.isCategory
-        ? "Supprimer cette catégorie ?"
-        : "Supprimer ce module ?",
+      title: n.isCategory ? "Supprimer cette catégorie ?" : "Supprimer ce module ?",
       text: n.isCategory
-        ? "« " +
-          n.name +
-          " » et TOUT son contenu (" +
-          kids.length +
-          " élément(s) : modules, sous-modules, historique lié) seront supprimés définitivement. Cette action est irréversible."
+        ? "« " + n.name + " » et TOUT son contenu (" + kids.length + " élément(s) : modules, sous-modules, historique lié) seront supprimés définitivement." + (largeCategoryDelete ? " Pour confirmer, retapez exactement le nom « " + n.name + " »." : " Cette action est irréversible.")
         : kids.length
-          ? "« " +
-            n.name +
-            " » et ses " +
-            kids.length +
-            " sous-module(s) seront supprimés définitivement."
+          ? "« " + n.name + " » et ses " + kids.length + " sous-module(s) seront supprimés définitivement."
           : "« " + n.name + " » et ses échéances seront supprimés.",
+      requireWord: largeCategoryDelete ? n.name : undefined,
     });
     if (!okc) return;
 
@@ -2287,17 +2213,18 @@ import { createConfirmModal } from "./ui/modal.js";
     buildIndex();
     renderAll();
 
+    var deleteUndoDuration = n.isCategory && kids.length ? 10000 : 6500;
     deleteUndoTimer = setTimeout(function () {
       commitPendingDeletion().catch(function (error) {
         console.error("Validation finale de suppression impossible", error);
       });
-    }, 6500);
+    }, deleteUndoDuration);
 
     toast(
-      "Module supprimé" + (kids.length ? " (avec sous-modules)" : ""),
+      n.isCategory ? "Catégorie supprimée" : "Module supprimé" + (kids.length ? " (avec sous-modules)" : ""),
       {
         label: "Annuler",
-        duration: 6500,
+        duration: deleteUndoDuration,
         onClick: undoPendingDeletion,
       },
     );
@@ -2633,6 +2560,7 @@ import { createConfirmModal } from "./ui/modal.js";
   }
 
   function activateView(view) {
+    if (view !== "dashboard" && currentCategoryId) closeCategory();
     currentView = view;
     Array.prototype.forEach.call(
       document.querySelectorAll(".tab"),
@@ -2734,6 +2662,11 @@ import { createConfirmModal } from "./ui/modal.js";
 
     installGlobalShortcuts();
 
+    $("categoryBackBtn").addEventListener("click", closeCategory);
+    $("categoryAddModuleBtn").addEventListener("click", function(){ openModuleForm(currentCategoryId); });
+    $("mParentSearch").addEventListener("input", function(){ filterParentOptions(this.value); });
+    $("mParent").addEventListener("change", function(){ selectedParentId=this.value||null; });
+
     $("categoryForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       var name = $("cName").value.trim();
@@ -2818,17 +2751,17 @@ import { createConfirmModal } from "./ui/modal.js";
       renderTree();
     });
     $("expandAllBtn").addEventListener("click", function () {
-      state.nodes.forEach(function (n) {
-        if (childrenOf(n.id).length) expandedNodes.add(n.id);
-      });
+      var scope = currentCategoryId ? descendantsOf(currentCategoryId) : [];
+      scope.forEach(function (n) { if (childrenOf(n.id).length) expandedNodes.add(n.id); });
       renderTree();
     });
     $("collapseAllBtn").addEventListener("click", function () {
-      expandedNodes.clear();
+      var scope = currentCategoryId ? descendantsOf(currentCategoryId) : [];
+      scope.forEach(function (n) { expandedNodes.delete(n.id); });
       renderTree();
     });
 
-    $("historyFilter").addEventListener("change", renderHistory);
+    $("historyFilter").addEventListener("input", renderHistory);
     $("historyTypeFilter").addEventListener("change", renderHistory);
     $("exportBtn").addEventListener("click", exportData);
     $("importBtn").addEventListener("click", function () {

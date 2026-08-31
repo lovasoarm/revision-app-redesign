@@ -20,7 +20,7 @@
     "audit:axe": "node tools/axe-audit.js",
     "test:e2e:local": "playwright test --config=playwright/playwright.config.js",
     "prepare:v10": "echo 'v10 prepared'",
-    "build": "vite build --root src --outDir ../dist",
+    "build": "vite build src --outDir ../dist",
     "preview": "vite preview --root src --port 1420"
   },
   "devDependencies": {

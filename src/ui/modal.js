@@ -6,65 +6,6 @@
  * - toggles aria-hidden on main content
  */
 
-export function openModal(modalEl) {
-  if (!modalEl) return;
-  const previouslyFocused = document.activeElement;
-  // mark main app as inert/aria-hidden
-  const main = document.getElementById('main') || document.querySelector('body');
-  if (main) main.setAttribute('aria-hidden', 'true');
-
-  modalEl.classList.remove('hidden');
-  modalEl.setAttribute('aria-modal', 'true');
-  modalEl.setAttribute('role', 'dialog');
-
-  // focus first focusable element
-  const focusable = modalEl.querySelectorAll('a[href], button:not([disabled]), textarea, input, select');
-  if (focusable.length) focusable[0].focus();
-  else modalEl.focus();
-
-  // Simple focus trap
-  function handleKey(e) {
-    if (e.key === 'Escape') {
-      closeModal(modalEl, previouslyFocused);
-    } else if (e.key === 'Tab') {
-      const focusables = Array.from(modalEl.querySelectorAll('a[href], button:not([disabled]), textarea, input, select'));
-      if (focusables.length === 0) {
-        e.preventDefault();
-        return;
-      }
-      const idx = focusables.indexOf(document.activeElement);
-      if (e.shiftKey && idx === 0) {
-        focusables[focusables.length - 1].focus();
-        e.preventDefault();
-      } else if (!e.shiftKey && idx === focusables.length - 1) {
-        focusables[0].focus();
-        e.preventDefault();
-      }
-    }
-  }
-  modalEl._modalKeyHandler = handleKey;
-  document.addEventListener('keydown', handleKey);
-  // store previously focused to restore later
-  modalEl._previouslyFocused = previouslyFocused;
-}
-
-export function closeModal(modalEl, restoreEl) {
-  if (!modalEl) return;
-  modalEl.classList.add('hidden');
-  modalEl.removeAttribute('aria-modal');
-  modalEl.removeAttribute('role');
-  const main = document.getElementById('main') || document.querySelector('body');
-  if (main) main.removeAttribute('aria-hidden');
-  if (modalEl._modalKeyHandler) {
-    document.removeEventListener('keydown', modalEl._modalKeyHandler);
-    delete modalEl._modalKeyHandler;
-  }
-  const toFocus = restoreEl || modalEl._previouslyFocused;
-  try { toFocus && toFocus.focus(); } catch(e) {}
-}
-
-
-// Original content preserved below (if any)
 export function createConfirmModal($, toast) {
   let previousFocus = null;
   let keydownHandler = null;
