@@ -1,0 +1,19 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions de la fenêtre principale : stockage local persistant (tauri-plugin-store), dialogue natif « Enregistrer sous » et écriture du fichier exporté à l'emplacement choisi par l'utilisateur (voir exportData() dans src/script.js).",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "store:default",
+    "dialog:default",
+    {
+      "identifier": "fs:default",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [{ "path": "**" }]
+    }
+  ]
+}

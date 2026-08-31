@@ -1,0 +1,16 @@
+[package]
+name = "revision-app-redesign"
+version = "10.0.0"
+description = "Application desktop légère de révision espacée, offline-first"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-store = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

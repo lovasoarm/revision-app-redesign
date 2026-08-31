@@ -1,30 +1,39 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Révision Espacée",
+  "version": "10.0.0",
+  "identifier": "com.revisionespacee.app",
   "build": {
-    "distDir": "../dist",
-    "devPath": "http://localhost:3000"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "fs": {
-        "all": false
-      },
-      "dialog": {
-        "all": false
-      },
-      "shell": {
-        "all": false
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Révision Espacée",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1100,
+        "minHeight": 700,
+        "resizable": true
       }
-    },
+    ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self'; connect-src 'self'"
-    },
-    "updater": {
-      "active": true,
-      "endpoints": [
-        "https://update.electronjs.org/your-repo/REPLACE"
-      ],
-      "dialog": true
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'self'; form-action 'self'"
     }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png",
+      "icons/icon.ico"
+    ]
   }
 }
